@@ -13,29 +13,45 @@ String.prototype.hashCode = function() {
   return hash;
 };
 
+// roll each of the dice a number of times
 function rollDice() {
+  // get all the visible dice's IDs from the DOM
   var allDices = $("#dices").find("[id]").map(function () {
     return $(this).data("dice_id");
   }).get();
-  var diceCount = [];
 
+  var diceCount = [];
+  // gets the number of times each dice has to be rolled, put them into *diceCount
   for (var i = 0; i < allDices.length; i++) {
     var dVal = parseInt($("#"+allDices[i]+"_count").val()) || 0;
+    // no rolling negative number of dice! (yet)
     dVal = dVal < 0 ? 0 : dVal;
     diceCount.push([allDices[i], dVal]);
   }
 
   var dReturn = [];
   var dVal = [];
+  var dSym = [];
+  var rollIdx;
+  var dId;
+
   for (var i = 0; i < diceCount.length; i++) {
     if (diceCount[i][1] > 0) {
-      for (var j = 0; j <diceCount[i][1]; j++) {
-        dVal.push(___dice[diceCount[i][0]].faces[Math.floor(___rngesus() * ___dice[diceCount[i][0]].faces.length)]);
-
+      dId = diceCount[i][0]
+      for (var j = 0; j < diceCount[i][1]; j++) {
+        // does the actual roll
+        rollIdx = Math.floor(___rngesus() * ___dice[dId].numFaces);
+        if(___dice[dId].faces && ___dice[dId].faces.length) {
+          dVal.push(___dice[dId].faces[rollIdx]);
+        }
+        if(___dice[dId].symbols && ___dice[dId].symbols.length) {
+          dSym.push(___dice[dId].symbols[rollIdx]);
+        }
       }
-      dReturn.push([diceCount[i][0], dVal.slice()] )
+      dReturn.push({"dId" : dId, "dVal" : dVal.slice(), "dSym" : dSym.slice()} );
     }
     dVal = [];
+    rollIdx = null;
   }
   //console.log("roll resuls")
   //console.log(dReturn);
@@ -44,23 +60,92 @@ function rollDice() {
 
 function displayRolls(diceResult) {
   var diceDiv = $("#diceRollResultDiv");
+  // clear previous results
   diceDiv.empty();
+
   var color, bgCol, dId;
+  var dVal, dSym;
+  var curDiceSpan;
   var total = 0;
   for (var i = 0; i < diceResult.length; i++) {
-    bgCol = ___dice[diceResult[i][0]].color;
+    dId = diceResult[i].dId;
+    bgCol = ___dice[dId].color;
     color = getTextColor(bgCol);
-    for (var j = 0; j < diceResult[i][1].length; j++) {
+    for (var j = 0; j < ___dice[dId].numFaces; j++) {
       //debugger;
-      diceDiv.append($("<span>").addClass("badge").css(
+      // show each number and symbol(s)
+      curDiceSpan = $("<span>").addClass("badge").css(
         {"background-color":bgCol, "color":color}
-        ).text(diceResult[i][1][j])
       );
-      total += diceResult[i][1][j];
+      if(diceResult[i].dVal.length) {
+        curDiceSpan.text(diceResult[i].dVal[j]);
+        total += diceResult[i].dVal[j];
+      }
+      if(diceResult[i].dSym.length) {
+        curDiceSpan.append()
+      }
+      diceDiv.append(curDiceSpan)
+
     }
     diceDiv.append($("<br>"));
   }
   diceDiv.append($("<span>").addClass("badge badge-secondary").text("Total: " + total));
+}
+
+function convertSymbols(syms) {
+  // convert list of symbols to displayables, like fontawesome icons
+  // *syms has to be comma seperated for now. may try fancy things later
+  var returnSyms = [];
+
+  var symList = syms.split(",").map(function(el) {
+    return el.trim();
+  });
+
+  // process each symbol
+  var curLi, curSym;
+  var curSpan;
+  var i, j, k;
+  var csArr = [];
+  var faArr = [];
+  for (i = 0; i < symList.length; i++) {
+    curLi = symList[i];
+    curSym = $("<span>");
+    curSpan = $("<span>");
+
+    for (j = 0; j < curLi.length; j++) {
+      if (curLi[j].indexOf("fa-") != 0) {
+        // not a font-awesome class or icon
+        faArr.forEach(function(el) {
+          curSym.addClass(el);
+        });
+        faArr = [];
+        curSym.text(curLi[j]);
+        curSpan.append(curSym);
+        curSym = $("<span>");
+      } else if(___dicePageSettings.symbols.indexOf(curLi[j]) != -1) {
+        // is an approved font-awesome icon
+        faArr.forEach(function(el) {
+          curSym.addClass(el);
+        });
+        faArr = [];
+
+      }
+    }
+    ///*
+    curSym.forEach(function(el) {
+      if(el.indexOf("fa-") == 0) {
+        faArr.push(el);
+      } else {
+        csArr.push(el);
+      }
+    });
+    //*/
+    csArr = [];
+    faArr = [];
+    returnSyms.append(curSpan);
+  }
+
+  return returnSyms;
 }
 
 function clearRolls() {
@@ -573,7 +658,7 @@ function getTextColor(bgc) {
   for( var i = 0; i < 3; i++) {
     rgb[i] = rgb[i] / 255.0;
     if (rgb[i] <= 0.03928) {
-      rgb[i] = rgb[i]/12.92
+      rgb[i] = rgb[i]/12.92;
     } else {
       rgb[i] = Math.pow(((rgb[i] + 0.055)/1.055), 2.4);
     }
@@ -612,7 +697,7 @@ function storeLS() {
 }
 
 function restoreLS() {
-  ___dice = JSON.parse(localStorage.userDice)
+  ___dice = JSON.parse(localStorage.userDice);
 }
 
 function initializeRandom() {
@@ -626,14 +711,14 @@ function initializeSymbols() {
 
 
 function init() {
-  ___dice.d6_DarkSouls_black = {"label" : "Black", "faces" : [0, 1, 1, 1, 2, 2], "color": "black"}
-  ___dice.d6_DarkSouls_blue = {"label" : "Blue", "faces" : [1, 2, 2, 2, 3, 3], "color" : "blue"}
-  ___dice.d6_DarkSouls_orange = {"label" : "Orange", "faces" : [1, 2, 2, 3, 3, 4], "color": "orange"}
+  ___dice.d6_DarkSouls_black = {"label" : "Black", "numFaces": 6, "faces" : [0, 1, 1, 1, 2, 2], "color": "black"}
+  ___dice.d6_DarkSouls_blue = {"label" : "Blue", "numFaces": 6, "faces" : [1, 2, 2, 2, 3, 3], "color" : "blue"}
+  ___dice.d6_DarkSouls_orange = {"label" : "Orange", "numFaces": 6, "faces" : [1, 2, 2, 3, 3, 4], "color": "orange"}
 
-  ___dice.d6_MassiveDarknes_red = {"label" : "Red", "faces" : [0, 1, 1, 2, 2, 3], "symbols" : [,,,"fa-sun-o", "fa-sun-o", "fa-diamond"], "color": "orangered"}
-  ___dice.d6_MassiveDarknes_yellow = {"label" : "Yellow", "faces" : [0, 1, 1, 1, 1, 2], "symbols" : [,,,,,"fa-sun-o"], "color" : "gold"}
-  ___dice.d6_MassiveDarknes_blue = {"label" : "Blue", "faces" : [0, 0, 1, 1, 1, 2], "symbols" : [,,,,,"fa-sun-o"], "color": "skyblue"}
-  ___dice.d6_MassiveDarknes_green = {"label" : "Green", "faces" : [0, 0, 1, 2, 2, 3], "symbols" : [,,,"fa-sun-o", "fa-sun-o", "fa-diamond"], "color": "lawngreen"}
+  ___dice.d6_MassiveDarknes_red = {"label" : "Red", "numFaces": 6, "faces" : [0, 1, 1, 2, 2, 3], "symbols" : [,,,"fa-sun-o", "fa-sun-o", "fa-diamond"], "color": "orangered"}
+  ___dice.d6_MassiveDarknes_yellow = {"label" : "Yellow", "numFaces": 6, "faces" : [0, 1, 1, 1, 1, 2], "symbols" : [,,,,,"fa-sun-o"], "color" : "gold"}
+  ___dice.d6_MassiveDarknes_blue = {"label" : "Blue", "numFaces": 6, "faces" : [0, 0, 1, 1, 1, 2], "symbols" : [,,,,,"fa-sun-o"], "color": "skyblue"}
+  ___dice.d6_MassiveDarknes_green = {"label" : "Green", "numFaces": 6, "faces" : [0, 0, 1, 2, 2, 3], "symbols" : [,,,"fa-sun-o", "fa-sun-o", "fa-diamond"], "color": "lawngreen"}
 
   if(localStorage.userDice) {
     restoreLS();
