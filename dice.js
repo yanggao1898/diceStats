@@ -1,5 +1,6 @@
 var ___dice = {};
 var ___stats = {};
+var ___dicePageSettings = {}
 
 String.prototype.hashCode = function() {
   var hash = 0, i, chr;
@@ -619,16 +620,20 @@ function initializeRandom() {
 
 }
 
+function initializeSymbols() {
+  ___dicePageSettings.symbols = ["fa-sun-o", "fa-diamond", "fa-cog", "fa-gear"];
+}
+
 
 function init() {
   ___dice.d6_DarkSouls_black = {"label" : "Black", "faces" : [0, 1, 1, 1, 2, 2], "color": "black"}
   ___dice.d6_DarkSouls_blue = {"label" : "Blue", "faces" : [1, 2, 2, 2, 3, 3], "color" : "blue"}
   ___dice.d6_DarkSouls_orange = {"label" : "Orange", "faces" : [1, 2, 2, 3, 3, 4], "color": "orange"}
 
-  ___dice.d6_MassiveDarknes_red = {"label" : "Red", "faces" : [0, 1, 1, 2, 2, 3], "color": "orangered"}
-  ___dice.d6_MassiveDarknes_yellow = {"label" : "Yellow", "faces" : [0, 1, 1, 1, 1, 2], "color" : "gold"}
-  ___dice.d6_MassiveDarknes_blue = {"label" : "Blue", "faces" : [0, 0, 1, 1, 1, 2], "color": "skyblue"}
-  ___dice.d6_MassiveDarknes_green = {"label" : "Green", "faces" : [0, 0, 1, 2, 2, 3], "color": "lawngreen"}
+  ___dice.d6_MassiveDarknes_red = {"label" : "Red", "faces" : [0, 1, 1, 2, 2, 3], "symbols" : [,,,"fa-sun-o", "fa-sun-o", "fa-diamond"], "color": "orangered"}
+  ___dice.d6_MassiveDarknes_yellow = {"label" : "Yellow", "faces" : [0, 1, 1, 1, 1, 2], "symbols" : [,,,,,"fa-sun-o"], "color" : "gold"}
+  ___dice.d6_MassiveDarknes_blue = {"label" : "Blue", "faces" : [0, 0, 1, 1, 1, 2], "symbols" : [,,,,,"fa-sun-o"], "color": "skyblue"}
+  ___dice.d6_MassiveDarknes_green = {"label" : "Green", "faces" : [0, 0, 1, 2, 2, 3], "symbols" : [,,,"fa-sun-o", "fa-sun-o", "fa-diamond"], "color": "lawngreen"}
 
   if(localStorage.userDice) {
     restoreLS();
@@ -637,6 +642,7 @@ function init() {
   }
 
   initializeRandom();
+  initializeSymbols();
 
   var diceKeys = Object.keys(___dice);
   var dEntry;
