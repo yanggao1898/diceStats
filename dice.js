@@ -51,6 +51,7 @@ function rollDice() {
       dReturn.push({"dId" : dId, "dVal" : dVal.slice(), "dSym" : dSym.slice()} );
     }
     dVal = [];
+    dSym = [];
     rollIdx = null;
   }
   //console.log("roll resuls")
@@ -71,20 +72,31 @@ function displayRolls(diceResult) {
     dId = diceResult[i].dId;
     bgCol = ___dice[dId].color;
     color = getTextColor(bgCol);
-    for (var j = 0; j < ___dice[dId].numFaces; j++) {
-      //debugger;
+    for (var j = 0; j < Math.max(diceResult[i].dVal.length, diceResult[i].dSym.length); j++) {
+      // debugger;
       // show each number and symbol(s)
       curDiceSpan = $("<span>").addClass("badge").css(
         {"background-color":bgCol, "color":color}
       );
       if(diceResult[i].dVal.length) {
-        curDiceSpan.text(diceResult[i].dVal[j]);
+        curDiceSpan.append($("<span>").css(
+          {"vertical-align": "middle"}).text(
+            diceResult[i].dVal[j]
+          )
+        );
         total += diceResult[i].dVal[j];
       }
       if(diceResult[i].dSym.length) {
-        curDiceSpan.append()
+        //debugger;
+        if (diceResult[i].dSym[j]) {
+          convertSymbols(diceResult[i].dSym[j]).forEach(function(el) {
+            curDiceSpan.append(el);
+          });
+        }
+
+
       }
-      diceDiv.append(curDiceSpan)
+      diceDiv.append(curDiceSpan);
 
     }
     diceDiv.append($("<br>"));
@@ -95,6 +107,7 @@ function displayRolls(diceResult) {
 function convertSymbols(syms) {
   // convert list of symbols to displayables, like fontawesome icons
   // *syms has to be comma seperated for now. may try fancy things later
+  //debugger;
   var returnSyms = [];
 
   var symList = syms.split(",").map(function(el) {
@@ -108,19 +121,23 @@ function convertSymbols(syms) {
   var csArr = [];
   var faArr = [];
   for (i = 0; i < symList.length; i++) {
-    curLi = symList[i];
+    curLi = symList[i].split(" ");
     curSym = $("<span>");
     curSpan = $("<span>");
 
+    // adds the fa icons/classes
     for (j = 0; j < curLi.length; j++) {
+      //debugger;
       if (curLi[j].indexOf("fa-") != 0) {
-        // not a font-awesome class or icon
+        // not a font-awesome class or icon (does not begin with 'fa-')
         faArr.forEach(function(el) {
           curSym.addClass(el);
         });
         faArr = [];
         curSym.text(curLi[j]);
-        curSpan.append(curSym);
+        curSpan.append(curSym).css(
+          {"vertical-align": "middle"}
+        );
         curSym = $("<span>");
       } else if(___dicePageSettings.symbols.indexOf(curLi[j]) != -1) {
         // is an approved font-awesome icon
@@ -128,10 +145,24 @@ function convertSymbols(syms) {
           curSym.addClass(el);
         });
         faArr = [];
-
+        curSpan.append(curSym);
+        curSym = $("<span>").addClass("fa").addClass(curLi[j]).css(
+          {"font-size": "70%", "vertical-align": "middle"}
+        );
+      } else {
+        // is a font-awesome class (begins with 'fa-', not an approved icon)
+        faArr.push(curLi[j]);
       }
     }
-    ///*
+    //faArr.forEach(function(el) {
+      faArr.forEach(function(el) {
+        curSym.addClass(el);
+      });
+      faArr = [];
+      curSpan.append(curSym);
+    //})
+
+    /*
     curSym.forEach(function(el) {
       if(el.indexOf("fa-") == 0) {
         faArr.push(el);
@@ -139,11 +170,13 @@ function convertSymbols(syms) {
         csArr.push(el);
       }
     });
-    //*/
+
     csArr = [];
     faArr = [];
-    returnSyms.append(curSpan);
+    //*/
+    returnSyms.push(curSpan);
   }
+  //debugger;
 
   return returnSyms;
 }
