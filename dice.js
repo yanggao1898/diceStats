@@ -66,24 +66,30 @@ function displayRolls(diceResult) {
 
   var color, bgCol, dId;
   var dVal, dSym;
-  var curDiceSpan;
+  var curDiceSpan, diceColorCss;
   var total = 0;
+  var subTot = 0;
   for (var i = 0; i < diceResult.length; i++) {
+    subTot = 0;
     dId = diceResult[i].dId;
     bgCol = ___dice[dId].color;
     color = getTextColor(bgCol);
+    diceColorCss = {"background-color":bgCol, "color":color }
     for (var j = 0; j < Math.max(diceResult[i].dVal.length, diceResult[i].dSym.length); j++) {
       // debugger;
       // show each number and symbol(s)
-      curDiceSpan = $("<span>").addClass("badge").css(
-        {"background-color":bgCol, "color":color}
+      curDiceSpan = $("<span>").addClass("badge dice-roll-result").css(
+        diceColorCss
       );
       if(diceResult[i].dVal.length) {
-        curDiceSpan.append($("<span>").css(
-          {"vertical-align": "middle"}).text(
+        curDiceSpan.append(
+          $("<span>").css(
+            {"vertical-align": "middle"}
+          ).text(
             diceResult[i].dVal[j]
           )
         );
+        subTot += diceResult[i].dVal[j];
         total += diceResult[i].dVal[j];
       }
       if(diceResult[i].dSym.length) {
@@ -93,12 +99,20 @@ function displayRolls(diceResult) {
             curDiceSpan.append(el);
           });
         }
-
-
       }
       diceDiv.append(curDiceSpan);
-
     }
+    diceDiv.append(
+      $("<span>").addClass(
+        "badge dice-roll-result"
+      ).css(
+        diceColorCss
+      ).append(
+        $("<span>").css(
+          {"vertical-align": "middle"}
+        ).text("Subtotal: " + subTot)
+      )
+    );
     diceDiv.append($("<br>"));
   }
   diceDiv.append($("<span>").addClass("badge badge-secondary").text("Total: " + total));
@@ -494,10 +508,11 @@ function processAddDiceMenu(e) {
 
 function addDiceToNS(dId, dLabel, dSides) {
   var range = [];
+  var syms = new Array(dSides).fill(null);
   for (var i = 1; i <= dSides; i++) {
     range.push(i);
   }
-  ___dice[dId] = {"label" : dLabel, "faces" : range, "color" : "white"};
+  ___dice[dId] = {"label" : dLabel, "numFaces" : dSides, "faces" : range, "symbols" : syms, "color" : "white"};
   storeLS();
 }
 
@@ -622,7 +637,9 @@ function editDicePoolEntry(e) {
     hideAfterPaletteSelect:true,
   });
 
-  var diceFaces = ___dice[dieId].faces;
+  var numFaces = ___dice[dieId].numFaces;
+  var diceFaces = ___dice[dieId].faces ? ___dice[dieId].faces : new Array(numFaces).fill(0);
+  var diceSyms = ___dice[dieId].symbols ? ___dice[dieId].symbols : new Array(numFaces).fill(null);
 
   var modalTableDiv = $("<div>").addClass("table-responsive").attr(
     {"id": "modalTableDiv", "data-dice_id":dieId}
@@ -633,18 +650,24 @@ function editDicePoolEntry(e) {
         $("<td>").text("Dice Face")
       ).append(
         $("<td>").text("Value")
+      ).append(
+        $("<td>").text("Symbol")
       )
     )
   );
   var tBody = $("<tbody>");
 
-  for (var i = 0; i < diceFaces.length; i++) {
+  for (var i = 0; i < numFaces; i++) {
     tBody.append(
       $("<tr>").append(
         $("<td>").text(i+1)
       ).append(
         $("<td>").append(
-          $("<input>").addClass("modal-table-val-entry").attr("data-didx", i).val(___dice[dieId].faces[i])
+          $("<input>").addClass("modal-table-val-entry").attr("data-didx", i).val(diceFaces[i])
+        )
+      ).append(
+        $("<td>").append(
+          $("<input>").addClass("modal-table-sym-entry").attr("data-didx", i).val(diceSyms[i])
         )
       )
     );
@@ -671,12 +694,26 @@ function modalLabelChange(e) {
   $("#" + dId + " .dice_pool_entry_label").text(newDiceLabel)
 }
 
-function modalValueChange(e) {
+function modalValSymChange(e) {
   //debugger;
   var dIdx = $(e.target).data("didx");
   var dVal = $(e.target).closest("[data-dice_id]").data("dice_id");
 
-  ___dice[dVal].faces[dIdx] = parseInt($(e.target).val());
+  var targClass = $(e.target).attr("class");
+
+  if(targClass.indexOf("sym") > -1) {
+    ___dice[dVal].symbols[dIdx] = $(e.target).val();
+  } else if (targClass.indexOf("val") > -1) {
+    ___dice[dVal].faces[dIdx] = parseInt($(e.target).val());
+  }
+}
+
+function modalSymbolChange(e) {
+  //debugger;
+  var dIdx = $(e.target).data("didx");
+  var dVal = $(e.target).closest("[data-dice_id]").data("dice_id");
+
+  ___dice[dVal].symbols[dIdx] = parseInt($(e.target).val());
 }
 
 function getTextColor(bgc) {
@@ -744,9 +781,9 @@ function initializeSymbols() {
 
 
 function init() {
-  ___dice.d6_DarkSouls_black = {"label" : "Black", "numFaces": 6, "faces" : [0, 1, 1, 1, 2, 2], "color": "black"}
-  ___dice.d6_DarkSouls_blue = {"label" : "Blue", "numFaces": 6, "faces" : [1, 2, 2, 2, 3, 3], "color" : "blue"}
-  ___dice.d6_DarkSouls_orange = {"label" : "Orange", "numFaces": 6, "faces" : [1, 2, 2, 3, 3, 4], "color": "orange"}
+  ___dice.d6_DarkSouls_black = {"label" : "Black", "numFaces": 6, "faces" : [0, 1, 1, 1, 2, 2], "symbols" : new Array(6).fill(null), "color": "black"}
+  ___dice.d6_DarkSouls_blue = {"label" : "Blue", "numFaces": 6, "faces" : [1, 2, 2, 2, 3, 3], "symbols" : new Array(6).fill(null), "color" : "blue"}
+  ___dice.d6_DarkSouls_orange = {"label" : "Orange", "numFaces": 6, "faces" : [1, 2, 2, 3, 3, 4], "symbols" : new Array(6).fill(null), "color": "orange"}
 
   ___dice.d6_MassiveDarknes_red = {"label" : "Red", "numFaces": 6, "faces" : [0, 1, 1, 2, 2, 3], "symbols" : [,,,"fa-sun-o", "fa-sun-o", "fa-diamond"], "color": "orangered"}
   ___dice.d6_MassiveDarknes_yellow = {"label" : "Yellow", "numFaces": 6, "faces" : [0, 1, 1, 1, 1, 2], "symbols" : [,,,,,"fa-sun-o"], "color" : "gold"}
@@ -782,7 +819,8 @@ function init() {
   $("#dicePool").on("click", ".dice_pool_edit_btn", editDicePoolEntry);
   $("#diceEditModal").on("hidden.bs.modal", modalHide);
   $("#diceEditModal").on("change", "#modalDiceEditLabel", modalLabelChange);
-  $("#diceEditModal").on("change", ".modal-table-val-entry", modalValueChange);
+  $("#diceEditModal").on("change", ".modal-table-val-entry", modalValSymChange);
+  $("#diceEditModal").on("change", ".modal-table-sym-entry", modalValSymChange);
   $("#diceEditModal").on("change", ".pick_color", updateColors);
   $("#clearRollBtn").click(clearRolls);
 
