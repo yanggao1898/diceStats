@@ -3,7 +3,7 @@ span.dice-roll-result + span.dice-roll-result {
 }
 
 @media (min-width: 1200px) {
-  show-in-lg {
+  .show-in-lg {
     display: none;
   }
 }
