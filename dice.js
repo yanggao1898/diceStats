@@ -116,6 +116,7 @@ function displayRolls(diceResult) {
     diceDiv.append($("<br>"));
   }
   diceDiv.append($("<span>").addClass("badge badge-secondary").text("Total: " + total));
+  $("#clearRollBtn").show();
 }
 
 function convertSymbols(syms) {
@@ -195,8 +196,28 @@ function convertSymbols(syms) {
   return returnSyms;
 }
 
+function resetDice() {
+  $("form#dices :input[type='number']").each(function() {
+    $(this).val(0);
+  });
+  clearRolls();
+  clearStats();
+}
+
 function clearRolls() {
   $("#diceRollResultDiv").empty();
+  $("#clearRollBtn").hide();
+}
+
+function clearStats() {
+  $("#rangeData").text("No Range");
+  $("#meanData").text("No Mean");
+  $("#medianData").text("No Median");
+  $("#modeData").text("No Mode");
+  $("#stdevData").text("No Standard Deviation");
+  ___stats.range = [];
+  ___stats.mean = 0;
+
 }
 
 function calculateDice(e) {
@@ -312,7 +333,7 @@ function calculateDice(e) {
   console.log("mode = " + mode);
   console.log("std dev = " + stdev);
 
-  if (range.length > 1) {
+  if (range && range.length > 1) {
     $("#rangeData").text(range[0] + " - " + range[1]);
     ___stats.range = range;
   } else {
@@ -526,7 +547,7 @@ function createDicePoolEntry(id) {
     {"color": getTextColor(color), "background-color": color }
   );
   var dCb = $("<span>").addClass("input-group-addon").append(
-    $("<input>").addClass("dice_pool_use").attr("type", "checkbox").prop("checked", "true")
+    $("<input>").addClass("dice_pool_use").attr("type", "checkbox").prop("checked", ___dice[id].visible)
   ).append("Use?");
   var dEB = $("<span>").addClass("input-group-btn").append(
     $("<button>").addClass("btn btn-secondary dice_pool_edit_btn").attr(
@@ -544,19 +565,25 @@ function createDicePoolEntry(id) {
 
 function toggleUseDiceFromPool(e) {
   var togTarget = e.target.closest("div");
-  var togId = togTarget.id;
-
+  var dId = togTarget.id;
+  //debugger;
+  ___dice[dId].visible = e.target.checked;
   if (e.target.checked == true) {
     // after clicking checkbox, checkbox is checked
-    addUseDiceFromPool(togId);
+    addUseDiceFromPool(dId);
   }
   else {
     // after clicking checkbox, checkbox is unchecked
-    delUseDiceFromPool(togId);
+    delUseDiceFromPool(dId);
   }
+  //___dice[dId].visible = e.target.checked;
+  storeLS();
 }
 
 function addUseDiceFromPool(dId) {
+  if(!___dice[dId].visible) {
+    return;
+  }
 //debugger;
   var newUseDice = $("<div>").addClass("input-group mb-1").append(
 
@@ -767,7 +794,22 @@ function storeLS() {
 }
 
 function restoreLS() {
-  ___dice = JSON.parse(localStorage.userDice);
+  // compatibility check
+  function compatCheck(tmp) {
+    if (!tmp.d6_DarkSouls_black.symbols) {
+      return false;
+    }
+    if (tmp.d6_DarkSouls_black.visible == undefined) {
+      return false;
+    }
+
+    return true;
+  }
+  var dice = JSON.parse(localStorage.userDice);
+  if (compatCheck(dice)) {
+    ___dice = JSON.parse(localStorage.userDice);
+
+  }
 }
 
 function initializeRandom() {
@@ -779,16 +821,15 @@ function initializeSymbols() {
   ___dicePageSettings.symbols = ["fa-sun-o", "fa-diamond", "fa-cog", "fa-gear"];
 }
 
-
 function init() {
-  ___dice.d6_DarkSouls_black = {"label" : "Black", "numFaces": 6, "faces" : [0, 1, 1, 1, 2, 2], "symbols" : new Array(6).fill(null), "color": "black"}
-  ___dice.d6_DarkSouls_blue = {"label" : "Blue", "numFaces": 6, "faces" : [1, 2, 2, 2, 3, 3], "symbols" : new Array(6).fill(null), "color" : "blue"}
-  ___dice.d6_DarkSouls_orange = {"label" : "Orange", "numFaces": 6, "faces" : [1, 2, 2, 3, 3, 4], "symbols" : new Array(6).fill(null), "color": "orange"}
+  ___dice.d6_DarkSouls_black = {"label" : "Black", "numFaces": 6, "faces" : [0, 1, 1, 1, 2, 2], "symbols" : new Array(6).fill(null), "color": "black", "visible": true}
+  ___dice.d6_DarkSouls_blue = {"label" : "Blue", "numFaces": 6, "faces" : [1, 2, 2, 2, 3, 3], "symbols" : new Array(6).fill(null), "color" : "blue", "visible": true}
+  ___dice.d6_DarkSouls_orange = {"label" : "Orange", "numFaces": 6, "faces" : [1, 2, 2, 3, 3, 4], "symbols" : new Array(6).fill(null), "color": "orange", "visible": true}
 
-  ___dice.d6_MassiveDarknes_red = {"label" : "Red", "numFaces": 6, "faces" : [0, 1, 1, 2, 2, 3], "symbols" : [,,,"fa-sun-o", "fa-sun-o", "fa-diamond"], "color": "orangered"}
-  ___dice.d6_MassiveDarknes_yellow = {"label" : "Yellow", "numFaces": 6, "faces" : [0, 1, 1, 1, 1, 2], "symbols" : [,,,,,"fa-sun-o"], "color" : "gold"}
-  ___dice.d6_MassiveDarknes_blue = {"label" : "Blue", "numFaces": 6, "faces" : [0, 0, 1, 1, 1, 2], "symbols" : [,,,,,"fa-sun-o"], "color": "skyblue"}
-  ___dice.d6_MassiveDarknes_green = {"label" : "Green", "numFaces": 6, "faces" : [0, 0, 1, 2, 2, 3], "symbols" : [,,,"fa-sun-o", "fa-sun-o", "fa-diamond"], "color": "lawngreen"}
+  ___dice.d6_MassiveDarknes_red = {"label" : "Red", "numFaces": 6, "faces" : [0, 1, 1, 2, 2, 3], "symbols" : [,,,"fa-sun-o", "fa-sun-o", "fa-diamond"], "color": "orangered", "visible": true}
+  ___dice.d6_MassiveDarknes_yellow = {"label" : "Yellow", "numFaces": 6, "faces" : [0, 1, 1, 1, 1, 2], "symbols" : [,,,,,"fa-sun-o"], "color" : "gold", "visible": true}
+  ___dice.d6_MassiveDarknes_blue = {"label" : "Blue", "numFaces": 6, "faces" : [0, 0, 1, 1, 1, 2], "symbols" : [,,,,,"fa-sun-o"], "color": "skyblue", "visible": true}
+  ___dice.d6_MassiveDarknes_green = {"label" : "Green", "numFaces": 6, "faces" : [0, 0, 1, 2, 2, 3], "symbols" : [,,,"fa-sun-o", "fa-sun-o", "fa-diamond"], "color": "lawngreen", "visible": true}
 
   if(localStorage.userDice) {
     restoreLS();
@@ -808,6 +849,7 @@ function init() {
 
   $("#dices").change(calculateDice);
   $("#rollDiceBtn").click(rollDice);
+  $("#resetDiceBtn").click(resetDice);
   /*$("#diceEdit").click(function(e) {
     //debugger;
     console.log(e);

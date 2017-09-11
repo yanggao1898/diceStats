@@ -38,12 +38,18 @@
                 </div>
               </div>
               <div class="row justify-content-center">
-                <div class="col-10">
+                <div class="col">
                   <div class="row justify-content-end">
-                    <div class="col-1 align-self-end">
-                      <button id="rollDiceBtn" type="button" class="btn btn-primary">
-                        Roll Dice!
-                      </button>
+                    <div class="col col-auto md-auto"> </div>
+                    <div class="col btn-group col-auto" role="group">
+                      <!--div class="btn-group" role="group"-->
+                        <button id="rollDiceBtn" type="button" class="btn btn-primary">
+                          Roll Dice!
+                        </button>
+                        <button id="resetDiceBtn" type="button" class="btn btn-dark">
+                          Reset dice
+                        </dice>
+                      <!--/div-->
                     </div>
                   </div>
                 </div>
@@ -104,10 +110,11 @@
             </div>
           </div>
           <div class="row justify-content-center">
-            <div class="col-10">
+            <div class="col">
               <div class="row justify-content-end" id="clearRollTableRow">
-                <div class="col-1 align-self-end">
-                  <button id="clearRollBtn" type="button" class="btn btn-primary">
+                <div class="col col-auto md-auto"> </div>
+                <div class="col col-auto">
+                  <button id="clearRollBtn" type="button" class="btn btn-primary" style="display: none">
                     Clear Rolls
                   </button>
                 </div>
