@@ -2,7 +2,7 @@ span.dice-roll-result + span.dice-roll-result {
   margin-left: 0.1em;
 }
 
-@media (min-width: 1200px) {
+@media (max-width: 1199px) {
   .show-in-lg {
     display: none;
   }
