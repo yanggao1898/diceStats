@@ -319,11 +319,11 @@ function calculateDice(e) {
   var stdev;
 
   if (finalIdx) {
-      range = crange(finalIdx);
-      mean = cmean(finalIdx, finalStep);
-      median = cmedian(finalIdx, finalStep);
-      mode = cmode(finalIdx, finalStep);
-      stdev = cstdev(finalIdx, finalStep, mean);
+    range = crange(finalIdx);
+    mean = cmean(finalIdx, finalStep);
+    median = cmedian(finalIdx, finalStep);
+    mode = cmode(finalIdx, finalStep);
+    stdev = cstdev(finalIdx, finalStep, mean);
   }
 
   // console.log(finalStep);
@@ -500,7 +500,17 @@ function crange(idx) {
 }
 
 function display(value) {
+  // TEST FUNCTION
   $("#display").text(value);
+}
+
+function toggleStats() {
+  $("#statTable").toggle();
+  if($("#statTable").is(":visible")) {
+    $("#statsToggleBtn").text("Hide Stats");
+  } else {
+    $("#statsToggleBtn").text("Show Stats");
+  }
 }
 
 function processAddDiceMenu(e) {
@@ -850,6 +860,7 @@ function init() {
   $("#dices").change(calculateDice);
   $("#rollDiceBtn").click(rollDice);
   $("#resetDiceBtn").click(resetDice);
+  $("#statsToggleBtn").click(toggleStats);
   /*$("#diceEdit").click(function(e) {
     //debugger;
     console.log(e);
@@ -865,6 +876,12 @@ function init() {
   $("#diceEditModal").on("change", ".modal-table-sym-entry", modalValSymChange);
   $("#diceEditModal").on("change", ".pick_color", updateColors);
   $("#clearRollBtn").click(clearRolls);
+
+  if($("#statTable").is(":visible")) {
+    $("#statsToggleBtn").text("Hide Stats");
+  } else {
+    $("#statsToggleBtn").text("Show Stats");
+  }
 
 }
 
