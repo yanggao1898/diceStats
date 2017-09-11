@@ -7,3 +7,7 @@ span.dice-roll-result + span.dice-roll-result {
     display: none;
   }
 }
+
+.scroll-y {
+  overflow-y: scroll;
+}

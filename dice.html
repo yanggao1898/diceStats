@@ -57,130 +57,131 @@
               </div>
             </div>
 
-
+            <div class="container-fluid" id="displayDiv">
+              <div class"container-fluid" id="rollsDiv">
+                <div class="row" id="rollTable">
+                  <div class="col-10">
+                    <h4 id="diceRollResultDiv">
+                      <!--<span class="badge" style="color:blue;background-color:red">4</span>-->
+                    </h4>
+                  </div>
+                </div>
+                <div class="row justify-content-center">
+                  <div class="col">
+                    <div class="row justify-content-end" id="clearRollTableRow">
+                      <div class="col col-auto md-auto"> </div>
+                      <div class="col col-auto">
+                        <button id="clearRollBtn" type="button" class="btn btn-primary" style="display: none">
+                          Clear Rolls
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="container-fluid" id="statsDiv">
+                <table class="table table-striped show-in-lg" id="statTable">
+                  <thead>
+                    <tr>
+                      <td></td>
+                      <td></td>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr id="range">
+                      <td id="rangeLabel">
+                        Range
+                      </td>
+                      <td id="rangeData">
+                        No Range
+                      </td>
+                    </tr>
+                    <tr id="mean">
+                      <td id="meanLabel">
+                        Mean
+                      </td>
+                      <td id="meanData">
+                        No Mean
+                      </td>
+                    </tr>
+                    <tr id="median">
+                      <td id="medianLabel">
+                        Median
+                      </td>
+                      <td id="medianData">
+                        No Median
+                      </td>
+                    </tr>
+                    <tr id="mode">
+                      <td id="modeLabel">
+                        Mode
+                      </td>
+                      <td id="modeData">
+                        No Mode
+                      </td>
+                    </tr>
+                    <tr id="stdev">
+                      <td id="stdevLabel">
+                        Standard Deviation
+                      </td>
+                      <td id="stdevData">
+                        No Standard Deviation
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+                <div class="row" id="statsToggleBtnDiv">
+                  <div class="col">
+                    <button type="button" class="btn btn-secondary btn-block" id="statsToggleBtn"> </button>
+                  </div>
+                </div>
+              </div>
+            </div>
 
           </div>
           <div id="diceEdit" class="tab-pane fade" roll="tabpanel">
-            <div class="row" note="!!">
-              <div class="col" note="!!">
-                <div class="row justify-content-center">
-                  <div class="col-11">
+            <!--div class="row" note="!!"-->
+              <div class="container-fluid" note="!!">
+                <div class="row justify-content-end">
+                  <div class="col">
+                    <div class="row">
+                      <div class="col scroll-y">
 
-                    <form id="dicePool" class="form-inline">
+                        <form id="dicePool" class="form-inline">
 
-                    </form>
+                        </form>
 
 
-                  </div>
-                  <div id="dicePoolOptions" class="col-9">
-                    <div class="row justify-content-end">
-                      <div class="col-1 align-self-end">
-                        <div class="btn-group" id="btnDicePoolAddMenu">
-                          <button type="button" class="btn btn-secondary dropdown-toggle" href="#" roll="button" data-toggle="dropdown">
-                            Add dice
-                          </button>
-                          <div class="dropdown-menu">
-                            <a class="dropdown-item" href="#">d4</a>
-                            <a class="dropdown-item" href="#">d6</a>
-                            <a class="dropdown-item" href="#">d8</a>
-                            <a class="dropdown-item" href="#">d10</a>
-                            <a class="dropdown-item" href="#">d12</a>
-                            <a class="dropdown-item" href="#">d20</a>
-                            <a class="dropdown-item" href="#">d100</a>
-                          </div>
-                        </div>
                       </div>
-                      <!--<div class="col-1 align-self-end">
-                        <button type="button" class="btn btn-secondary">
-
-                        </button>
-                      </div> -->
+                      <div id="dicePoolOptions" class="col">
+                        <footer class="footer">
+                          <div class="container">
+                            <div class="row justify-content-end ">
+                              <div class="col col-auto md-auto"></div>
+                              <div class="col col-auto btn-group" id="btnDicePoolAddMenu">
+                                <button type="button" class="btn btn-secondary dropdown-toggle" href="#" roll="button" data-toggle="dropdown">
+                                  Add dice
+                                </button>
+                                <div class="dropdown-menu">
+                                  <a class="dropdown-item" href="#">d4</a>
+                                  <a class="dropdown-item" href="#">d6</a>
+                                  <a class="dropdown-item" href="#">d8</a>
+                                  <a class="dropdown-item" href="#">d10</a>
+                                  <a class="dropdown-item" href="#">d12</a>
+                                  <a class="dropdown-item" href="#">d20</a>
+                                  <a class="dropdown-item" href="#">d100</a>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </footer>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
-        </div>
-        <div class="container-fluid" id="displayDiv">
-          <div class"container-fluid" id="rollsDiv">
-            <div class="row" id="rollTable">
-              <div class="col-10">
-                <h4 id="diceRollResultDiv">
-                  <!--<span class="badge" style="color:blue;background-color:red">4</span>-->
-                </h4>
-              </div>
-            </div>
-            <div class="row justify-content-center">
-              <div class="col">
-                <div class="row justify-content-end" id="clearRollTableRow">
-                  <div class="col col-auto md-auto"> </div>
-                  <div class="col col-auto">
-                    <button id="clearRollBtn" type="button" class="btn btn-primary" style="display: none">
-                      Clear Rolls
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="container-fluid" id="statsDiv">
-            <table class="table table-striped show-in-lg" id="statTable">
-              <thead>
-                <tr>
-                  <td></td>
-                  <td></td>
-                </tr>
-              </thead>
-              <tbody>
-                <tr id="range">
-                  <td id="rangeLabel">
-                    Range
-                  </td>
-                  <td id="rangeData">
-                    No Range
-                  </td>
-                </tr>
-                <tr id="mean">
-                  <td id="meanLabel">
-                    Mean
-                  </td>
-                  <td id="meanData">
-                    No Mean
-                  </td>
-                </tr>
-                <tr id="median">
-                  <td id="medianLabel">
-                    Median
-                  </td>
-                  <td id="medianData">
-                    No Median
-                  </td>
-                </tr>
-                <tr id="mode">
-                  <td id="modeLabel">
-                    Mode
-                  </td>
-                  <td id="modeData">
-                    No Mode
-                  </td>
-                </tr>
-                <tr id="stdev">
-                  <td id="stdevLabel">
-                    Standard Deviation
-                  </td>
-                  <td id="stdevData">
-                    No Standard Deviation
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-            <div class="row" id="statsToggleBtnDiv">
-              <div class="col">
-                <button type="button" class="btn btn-secondary btn-block" id="statsToggleBtn"> </button>
-              </div>
-            </div>
-          </div>
+          <!--/div-->
         </div>
       </div>
     </div>
