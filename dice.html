@@ -24,12 +24,12 @@
     <div class="container-fluid">
       <div class="row justify-content-center">
         <div class="col-10">
-          <div class="container-fluid">
-            <ul class="nav nav-pills" roll="tablist">
+          <div class="container-fluid d-flex flex-column">
+            <ul class="nav nav-pills d-flex flex-sm-row flex-column -flex0" roll="tablist">
               <li class="nav-item"><a class="nav-link active" data-toggle="tab" href="#diceCount">Dices</a></li>
               <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#diceEdit">Edit Dices</a></li>
             </ul>
-            <div class="tab-content" id="tabs">
+            <div class="tab-content d-flex flex-column -flex1" id="tabs">
 
               <div id="diceCount" class="tab-pane fade show active" roll="tabpanel">
                 <div class="container-fluid">
@@ -141,8 +141,8 @@
                 </div>
 
               </div>
-              <div id="diceEdit" class="tab-pane fade" roll="tabpanel">
-                <div class="container-fluid">
+              <div id="diceEdit" class="tab-pane d-flex flex-column -flex1 fade" roll="tabpanel">
+                <div class="d-flex -flex1">
                   <div class="row justify-content-end">
                     <div class="col scroll-y">
                       <form id="dicePool" class="form-inline">
@@ -151,7 +151,7 @@
                     </div>
                   </div>
                 </div>
-                <div class="footer">
+                <div class="footer -flex0">
                   <div id="dicePoolOptions" class="container">
                     <div class="row justify-content-end">
                       <div class="col col-auto md-auto"></div>

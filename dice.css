@@ -12,6 +12,9 @@ span.dice-roll-result + span.dice-roll-result {
   overflow-y: scroll;
 }
 
+.nav {
+  margin-bottom: 15px;
+}
 
 html {
   position: relative;
@@ -22,10 +25,17 @@ body {
   /*margin-bottom: 60px;*/
 }
 .footer {
-  position: absolute;
-  bottom: 0;
-  /* Set the fixed height of the footer here */
-  height: 40px;
-  line-height: 40px; /* Vertically center the text there */
-  /*background-color: #f5f5f5;*/
+  margin-top:15px;
+}
+
+.-flex0 {
+  flex: 0 0 auto;
+}
+
+.-flex1 {
+  flex: 1 1 auto;
+}
+
+.container-fluid {
+  height: 100%;
 }
