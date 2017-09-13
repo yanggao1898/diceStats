@@ -11,3 +11,21 @@ span.dice-roll-result + span.dice-roll-result {
 .scroll-y {
   overflow-y: scroll;
 }
+
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+body {
+  /* Margin bottom by footer height */
+  /*margin-bottom: 60px;*/
+}
+.footer {
+  position: absolute;
+  bottom: 0;
+  /* Set the fixed height of the footer here */
+  height: 40px;
+  line-height: 40px; /* Vertically center the text there */
+  /*background-color: #f5f5f5;*/
+}

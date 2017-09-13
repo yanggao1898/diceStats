@@ -877,6 +877,16 @@ function init() {
   $("#diceEditModal").on("change", ".pick_color", updateColors);
   $("#clearRollBtn").click(clearRolls);
 
+  /*
+  $('a[data-toggle="tab"][href="#diceEdit"]').on("shown.bs.tab", function(e) {
+    $("#dicePoolOptions").show();
+  });
+
+  $('a[data-toggle="tab"][href="#diceEdit"]').on("hidden.bs.tab", function(e) {
+    $("#dicePoolOptions").hide();
+  });
+  */
+  
   if($("#statTable").is(":visible")) {
     $("#statsToggleBtn").text("Hide Stats");
   } else {

@@ -1,5 +1,5 @@
 <HTML>
-  <header>
+  <head>
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" type="text/css" href="https://rawgit.com/bgrins/spectrum/master/spectrum.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
@@ -19,172 +19,168 @@
 
 
 
-  </header>
+  </head>
   <body>
-    <div class="row justify-content-center">
-      <div class="col-10">
-        <ul class="nav nav-tabs" roll="tablist">
-          <li class="nav-item"><a class="nav-link active" data-toggle="tab" href="#diceCount">Dices</a></li>
-          <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#diceEdit">Edit Dices</a></li>
-        </ul>
-        <div class="tab-content" id="tabs">
+    <div class="container-fluid">
+      <div class="row justify-content-center">
+        <div class="col-10">
+          <div class="container-fluid">
+            <ul class="nav nav-pills" roll="tablist">
+              <li class="nav-item"><a class="nav-link active" data-toggle="tab" href="#diceCount">Dices</a></li>
+              <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#diceEdit">Edit Dices</a></li>
+            </ul>
+            <div class="tab-content" id="tabs">
 
-          <div id="diceCount" class="tab-pane fade show active" roll="tabpanel">
-            <div class="container-fluid">
-              <div class="row">
-                <div class="col">
-                  <form id="dices" >
+              <div id="diceCount" class="tab-pane fade show active" roll="tabpanel">
+                <div class="container-fluid">
+                  <div class="row">
+                    <div class="col">
+                      <form id="dices" >
 
-                  </form>
-                </div>
-              </div>
-              <div class="row justify-content-center">
-                <div class="col">
-                  <div class="row justify-content-end">
-                    <div class="col col-auto md-auto"> </div>
-                    <div class="col btn-group col-auto" role="group">
-                      <!--div class="btn-group" role="group"-->
-                        <button id="rollDiceBtn" type="button" class="btn btn-primary">
-                          Roll Dice!
-                        </button>
-                        <button id="resetDiceBtn" type="button" class="btn btn-dark">
-                          Reset dice
-                        </dice>
-                      <!--/div-->
+                      </form>
                     </div>
                   </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="container-fluid" id="displayDiv">
-              <div class"container-fluid" id="rollsDiv">
-                <div class="row" id="rollTable">
-                  <div class="col-10">
-                    <h4 id="diceRollResultDiv">
-                      <!--<span class="badge" style="color:blue;background-color:red">4</span>-->
-                    </h4>
-                  </div>
-                </div>
-                <div class="row justify-content-center">
-                  <div class="col">
-                    <div class="row justify-content-end" id="clearRollTableRow">
-                      <div class="col col-auto md-auto"> </div>
-                      <div class="col col-auto">
-                        <button id="clearRollBtn" type="button" class="btn btn-primary" style="display: none">
-                          Clear Rolls
-                        </button>
+                  <div class="row justify-content-center">
+                    <div class="col">
+                      <div class="row justify-content-end">
+                        <div class="col col-auto md-auto"> </div>
+                        <div class="col btn-group col-auto" role="group">
+                          <!--div class="btn-group" role="group"-->
+                            <button id="rollDiceBtn" type="button" class="btn btn-primary">
+                              Roll Dice!
+                            </button>
+                            <button id="resetDiceBtn" type="button" class="btn btn-dark">
+                              Reset dice
+                            </dice>
+                          <!--/div-->
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
-              <div class="container-fluid" id="statsDiv">
-                <table class="table table-striped show-in-lg" id="statTable">
-                  <thead>
-                    <tr>
-                      <td></td>
-                      <td></td>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr id="range">
-                      <td id="rangeLabel">
-                        Range
-                      </td>
-                      <td id="rangeData">
-                        No Range
-                      </td>
-                    </tr>
-                    <tr id="mean">
-                      <td id="meanLabel">
-                        Mean
-                      </td>
-                      <td id="meanData">
-                        No Mean
-                      </td>
-                    </tr>
-                    <tr id="median">
-                      <td id="medianLabel">
-                        Median
-                      </td>
-                      <td id="medianData">
-                        No Median
-                      </td>
-                    </tr>
-                    <tr id="mode">
-                      <td id="modeLabel">
-                        Mode
-                      </td>
-                      <td id="modeData">
-                        No Mode
-                      </td>
-                    </tr>
-                    <tr id="stdev">
-                      <td id="stdevLabel">
-                        Standard Deviation
-                      </td>
-                      <td id="stdevData">
-                        No Standard Deviation
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-                <div class="row" id="statsToggleBtnDiv">
-                  <div class="col">
-                    <button type="button" class="btn btn-secondary btn-block" id="statsToggleBtn"> </button>
-                  </div>
-                </div>
-              </div>
-            </div>
 
-          </div>
-          <div id="diceEdit" class="tab-pane fade" roll="tabpanel">
-            <!--div class="row" note="!!"-->
-              <div class="container-fluid" note="!!">
-                <div class="row justify-content-end">
-                  <div class="col">
-                    <div class="row">
-                      <div class="col scroll-y">
-
-                        <form id="dicePool" class="form-inline">
-
-                        </form>
-
-
+                <div class="container-fluid" id="displayDiv">
+                  <div class"container-fluid" id="rollsDiv">
+                    <div class="row" id="rollTable">
+                      <div class="col-10">
+                        <h4 id="diceRollResultDiv">
+                          <!--<span class="badge" style="color:blue;background-color:red">4</span>-->
+                        </h4>
                       </div>
-                      <div id="dicePoolOptions" class="col">
-                        <footer class="footer">
-                          <div class="container">
-                            <div class="row justify-content-end ">
-                              <div class="col col-auto md-auto"></div>
-                              <div class="col col-auto btn-group" id="btnDicePoolAddMenu">
-                                <button type="button" class="btn btn-secondary dropdown-toggle" href="#" roll="button" data-toggle="dropdown">
-                                  Add dice
-                                </button>
-                                <div class="dropdown-menu">
-                                  <a class="dropdown-item" href="#">d4</a>
-                                  <a class="dropdown-item" href="#">d6</a>
-                                  <a class="dropdown-item" href="#">d8</a>
-                                  <a class="dropdown-item" href="#">d10</a>
-                                  <a class="dropdown-item" href="#">d12</a>
-                                  <a class="dropdown-item" href="#">d20</a>
-                                  <a class="dropdown-item" href="#">d100</a>
-                                </div>
-                              </div>
-                            </div>
+                    </div>
+                    <div class="row justify-content-center">
+                      <div class="col">
+                        <div class="row justify-content-end" id="clearRollTableRow">
+                          <div class="col col-auto md-auto"> </div>
+                          <div class="col col-auto">
+                            <button id="clearRollBtn" type="button" class="btn btn-primary" style="display: none">
+                              Clear Rolls
+                            </button>
                           </div>
-                        </footer>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="container-fluid" id="statsDiv">
+                    <table class="table table-striped show-in-lg" id="statTable">
+                      <thead>
+                        <tr>
+                          <td></td>
+                          <td></td>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr id="range">
+                          <td id="rangeLabel">
+                            Range
+                          </td>
+                          <td id="rangeData">
+                            No Range
+                          </td>
+                        </tr>
+                        <tr id="mean">
+                          <td id="meanLabel">
+                            Mean
+                          </td>
+                          <td id="meanData">
+                            No Mean
+                          </td>
+                        </tr>
+                        <tr id="median">
+                          <td id="medianLabel">
+                            Median
+                          </td>
+                          <td id="medianData">
+                            No Median
+                          </td>
+                        </tr>
+                        <tr id="mode">
+                          <td id="modeLabel">
+                            Mode
+                          </td>
+                          <td id="modeData">
+                            No Mode
+                          </td>
+                        </tr>
+                        <tr id="stdev">
+                          <td id="stdevLabel">
+                            Standard Deviation
+                          </td>
+                          <td id="stdevData">
+                            No Standard Deviation
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                    <div class="row" id="statsToggleBtnDiv">
+                      <div class="col">
+                        <button type="button" class="btn btn-secondary btn-block" id="statsToggleBtn"> </button>
                       </div>
                     </div>
                   </div>
                 </div>
+
+              </div>
+              <div id="diceEdit" class="tab-pane fade" roll="tabpanel">
+                <div class="container-fluid">
+                  <div class="row justify-content-end">
+                    <div class="col scroll-y">
+                      <form id="dicePool" class="form-inline">
+
+                      </form>
+                    </div>
+                  </div>
+                </div>
+                <div class="footer">
+                  <div id="dicePoolOptions" class="container">
+                    <div class="row justify-content-end">
+                      <div class="col col-auto md-auto"></div>
+                      <div class="col col-auto btn-group" id="btnDicePoolAddMenu">
+                        <button type="button" class="btn btn-secondary dropdown-toggle" href="#" roll="button" data-toggle="dropdown">
+                          Add dice
+                        </button>
+                        <div class="dropdown-menu">
+                          <a class="dropdown-item" href="#">d4</a>
+                          <a class="dropdown-item" href="#">d6</a>
+                          <a class="dropdown-item" href="#">d8</a>
+                          <a class="dropdown-item" href="#">d10</a>
+                          <a class="dropdown-item" href="#">d12</a>
+                          <a class="dropdown-item" href="#">d20</a>
+                          <a class="dropdown-item" href="#">d100</a>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
               </div>
             </div>
-          <!--/div-->
+          </div>
+
         </div>
       </div>
     </div>
+
 
     <div class="modal fade" id="diceEditModal" tabindex="-1" role="dialog">
       <div class="modal-dialog" role="document">
@@ -199,5 +195,7 @@
       </div>
 
     </div>
+
+
   </body>
 </HTML>
