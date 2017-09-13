@@ -562,10 +562,14 @@ function createDicePoolEntry(id) {
   var dEB = $("<span>").addClass("input-group-btn").append(
     $("<button>").addClass("btn btn-secondary dice_pool_edit_btn").attr(
       {"type": "button", "data-toggle":"modal", "data-target":"#diceEditModal"}
-    ).text("Edit")
+    ).append(
+      $("<i>").addClass("fa fa-pencil")
+    )
   );
   var dDB = $("<span>").addClass("input-group-btn").append(
-    $("<button>").addClass("btn btn-secondary dice_pool_del_btn").attr("type", "button").text("Delete")
+    $("<button>").addClass("btn btn-secondary dice_pool_del_btn").attr("type", "button").append(
+      $("<i>").addClass("fa fa-trash-o")
+    )
   );
 
   dPDiv.append(dL, dCb, dEB, dDB);
@@ -886,7 +890,7 @@ function init() {
     $("#dicePoolOptions").hide();
   });
   */
-  
+
   if($("#statTable").is(":visible")) {
     $("#statsToggleBtn").text("Hide Stats");
   } else {
