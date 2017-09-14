@@ -50,3 +50,12 @@ body {
 .container-fluid {
 
 }
+
+.dice_pool_edit_btn_grp {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.dice_pool_edit_btn_grp + .dropdown-menu {
+    min-width: 4rem;
+}

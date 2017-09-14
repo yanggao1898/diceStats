@@ -543,7 +543,14 @@ function addDiceToNS(dId, dLabel, dSides) {
   for (var i = 1; i <= dSides; i++) {
     range.push(i);
   }
-  ___dice[dId] = {"label" : dLabel, "numFaces" : dSides, "faces" : range, "symbols" : syms, "color" : "white"};
+  ___dice[dId] = {
+    "label" : dLabel,
+    "numFaces" : dSides,
+    "faces" : range,
+    "symbols" : syms,
+    "color" : "white",
+    "visible" : true
+  };
   storeLS();
 }
 
@@ -556,9 +563,42 @@ function createDicePoolEntry(id) {
   var dL = $("<span>").addClass("input-group-addon dice_pool_entry_label").text(label).css(
     {"color": getTextColor(color), "background-color": color }
   );
+
   var dCb = $("<span>").addClass("input-group-addon").append(
     $("<input>").addClass("dice_pool_use").attr("type", "checkbox").prop("checked", ___dice[id].visible)
   ).append("Use?");
+
+  var fACbIcon = ___dice[id].visible ? "fa-check-square-o" : "fa-square-o";
+  var dFACb = $("<span>").addClass("input-group-addon dice_pool_use").append(
+    $("<i>").addClass("fa fa-fw " + fACbIcon)
+  );
+
+  var dBtnGrp = $("<div>").addClass("btn-group").append(
+    $("<button>").addClass("btn btn-secondary dropdown-toggle dice_pool_edit_btn_grp").attr(
+      {
+        "type": "button", "href":"#", "roll":"button", "data-toggle": "dropdown"
+      }
+    ).append(
+      $("<i>").addClass("fa fa-bars")
+    )
+  ).append(
+    $("<div>").addClass("dropdown-menu").append(
+      $("<a>").addClass("dropdown-item dice_pool_edit_btn").attr(
+        {"href":"#", "data-toggle":"modal", "data-target":"#diceEditModal"}
+      ).append(
+        $("<i>").addClass("fa fa-pencil")
+      )
+    ).append(
+      $("<div>").addClass("dropdown-divider")
+    ).append(
+      $("<a>").addClass("dropdown-item dice_pool_del_btn").attr(
+        {"href":"#"}
+      ).append(
+        $("<i>").addClass("fa fa-trash-o")
+      )
+    )
+  );
+
   var dEB = $("<span>").addClass("input-group-btn").append(
     $("<button>").addClass("btn btn-secondary dice_pool_edit_btn").attr(
       {"type": "button", "data-toggle":"modal", "data-target":"#diceEditModal"}
@@ -572,17 +612,29 @@ function createDicePoolEntry(id) {
     )
   );
 
-  dPDiv.append(dL, dCb, dEB, dDB);
+  dPDiv.append(dL, dFACb, dBtnGrp);
 
   return dPDiv;
 }
 
 function toggleUseDiceFromPool(e) {
-  var togTarget = e.target.closest("div");
+  //debugger;
+  var togTarget = e.target.closest("div.dice_pool_entry");
   var dId = togTarget.id;
   //debugger;
-  ___dice[dId].visible = e.target.checked;
-  if (e.target.checked == true) {
+  ___dice[dId].visible = !___dice[dId].visible;
+  var targ;
+  if ($(e.target).is("span")) {
+    targ = $(e.target).find("i.fa");
+  } else {
+    targ = $(e.target);
+  }
+
+  targ.toggleClass("fa-check-square-o fa-square-o");
+
+
+  //___dice[dId].visible = e.target.checked;
+  if (___dice[dId].visible) {
     // after clicking checkbox, checkbox is checked
     addUseDiceFromPool(dId);
   }
@@ -590,6 +642,7 @@ function toggleUseDiceFromPool(e) {
     // after clicking checkbox, checkbox is unchecked
     delUseDiceFromPool(dId);
   }
+
   //___dice[dId].visible = e.target.checked;
   storeLS();
 }
@@ -618,7 +671,7 @@ function delUseDiceFromPool(dId) {
 
 
 function deleteDicePoolEntry(e) {
-  var delTarget = e.target.closest("div");
+  var delTarget = e.target.closest("div.dice_pool_entry");
   var delId = delTarget.id;
 
   // REMOVE FROM DICECOUNT TAB
@@ -633,7 +686,7 @@ function deleteDicePoolEntry(e) {
 }
 
 function editDicePoolEntry(e) {
-  var dieTarget = e.target.closest("div");
+  var dieTarget = e.target.closest("div.dice_pool_entry");
   var dieId = dieTarget.id;
 
   //$("#diceEditTitle").text(___dice[dieId].label);
