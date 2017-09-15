@@ -12,6 +12,12 @@ span.dice-roll-result + span.dice-roll-result {
   .dice_pool_entry_label {
     max-width: 100%;
   }
+}
+
+@media (min-width: 575px) {
+  .nav-item {
+    width: 10rem;
+  }
 
   .dice_pool_entry {
     max-width: 15rem;
@@ -20,13 +26,22 @@ span.dice-roll-result + span.dice-roll-result {
   #dicePool .input-group {
     margin-right: 1rem!important;
   }
-
 }
 
-@media (min-width: 575px) {
-  .nav-item {
-    width: 10rem;
-  }
+.fa-eye-slash {
+  color: firebrick;
+}
+
+.fa-eye {
+  color: slateblue;
+}
+
+.dice_pool_entry {
+  min-height: 3.5rem;
+}
+
+.-minh35 {
+  min-height: 3.5rem;
 }
 
 @media (max-width: 765px) {

@@ -115,7 +115,7 @@ function displayRolls(diceResult) {
     );
     diceDiv.append($("<br>"));
   }
-  diceDiv.append($("<span>").addClass("badge badge-secondary").text("Total: " + total));
+  diceDiv.append($("<span>").addClass("badge badge-secondary mt-1").text("Total: " + total));
   $("#clearRollBtn").show();
 }
 
@@ -564,11 +564,9 @@ function createDicePoolEntry(id) {
     {"color": getTextColor(color), "background-color": color }
   );
 
-  var dCb = $("<span>").addClass("input-group-addon").append(
-    $("<input>").addClass("dice_pool_use").attr("type", "checkbox").prop("checked", ___dice[id].visible)
-  ).append("Use?");
+  //var fACbIcon = ___dice[id].visible ? "fa-check-square-o" : "fa-square-o";
+  var fACbIcon = ___dice[id].visible ? "fa-eye" : "fa-eye-slash";
 
-  var fACbIcon = ___dice[id].visible ? "fa-check-square-o" : "fa-square-o";
   var dFACb = $("<span>").addClass("input-group-addon dice_pool_use").append(
     $("<i>").addClass("fa fa-fw " + fACbIcon)
   );
@@ -586,7 +584,7 @@ function createDicePoolEntry(id) {
       $("<a>").addClass("dropdown-item dice_pool_edit_btn").attr(
         {"href":"#", "data-toggle":"modal", "data-target":"#diceEditModal"}
       ).append(
-        $("<i>").addClass("fa fa-pencil")
+        $("<i>").addClass("fa fa-pencil fa-lg")
       )
     ).append(
       $("<div>").addClass("dropdown-divider")
@@ -594,7 +592,7 @@ function createDicePoolEntry(id) {
       $("<a>").addClass("dropdown-item dice_pool_del_btn").attr(
         {"href":"#"}
       ).append(
-        $("<i>").addClass("fa fa-trash-o")
+        $("<i>").addClass("fa fa-trash-o fa-lg")
       )
     )
   );
@@ -630,7 +628,8 @@ function toggleUseDiceFromPool(e) {
     targ = $(e.target);
   }
 
-  targ.toggleClass("fa-check-square-o fa-square-o");
+  //targ.toggleClass("fa-check-square-o fa-square-o");
+  targ.toggleClass("fa-eye fa-eye-slash");
 
 
   //___dice[dId].visible = e.target.checked;
@@ -652,7 +651,7 @@ function addUseDiceFromPool(dId) {
     return;
   }
 //debugger;
-  var newUseDice = $("<div>").addClass("input-group mb-1").append(
+  var newUseDice = $("<div>").addClass("input-group mb-1 -minh35").append(
 
     $("<span>").addClass("input-group-addon dice_count_label").text(___dice[dId].label).css(
       {"color": getTextColor(___dice[dId].color), "background-color":___dice[dId].color }
