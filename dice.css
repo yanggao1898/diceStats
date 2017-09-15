@@ -8,6 +8,31 @@ span.dice-roll-result + span.dice-roll-result {
   }
 }
 
+@media (min-width: 764px) {
+  .dice_pool_entry_label {
+    max-width: 100%;
+  }
+
+  .dice_pool_entry {
+    max-width: 15rem;
+  }
+
+  #dicePool .input-group {
+    margin-right: 1rem!important;
+  }
+
+}
+
+@media (min-width: 575px) {
+  .nav-item {
+    width: 10rem;
+  }
+}
+
+@media (max-width: 765px) {
+
+}
+
 .scroll-y {
   overflow-y: auto;
 }
@@ -44,11 +69,21 @@ body {
   flex: 1 1 auto;
 }
 
+.-flex-wrap {
+  flex-flow: wrap;
+}
+
 .h100 {
   height: 100%;
 }
+
 .container-fluid {
 
+}
+
+.dice_count_label {
+  max-width: 10rem;
+  flex: 1;
 }
 
 .dice_pool_edit_btn_grp {

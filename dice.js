@@ -559,8 +559,8 @@ function createDicePoolEntry(id) {
   var sides = ___dice[id].faces;
   var color = ___dice[id].color;
 
-  var dPDiv = $("<div>").addClass("input-group mr-3 mb-2 dice_pool_entry").attr("id", id);
-  var dL = $("<span>").addClass("input-group-addon dice_pool_entry_label").text(label).css(
+  var dPDiv = $("<div>").addClass("input-group mb-2 dice_pool_entry").attr("id", id);
+  var dL = $("<span>").addClass("input-group-addon -flex1 dice_pool_entry_label").text(label).css(
     {"color": getTextColor(color), "background-color": color }
   );
 
@@ -612,7 +612,7 @@ function createDicePoolEntry(id) {
     )
   );
 
-  dPDiv.append(dL, dFACb, dBtnGrp);
+  dPDiv.append(dFACb, dL, dBtnGrp);
 
   return dPDiv;
 }
@@ -654,7 +654,7 @@ function addUseDiceFromPool(dId) {
 //debugger;
   var newUseDice = $("<div>").addClass("input-group mb-1").append(
 
-    $("<span>").addClass("input-group-addon").text(___dice[dId].label).css(
+    $("<span>").addClass("input-group-addon dice_count_label").text(___dice[dId].label).css(
       {"color": getTextColor(___dice[dId].color), "background-color":___dice[dId].color }
     )
   ).append(
