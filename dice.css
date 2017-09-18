@@ -55,6 +55,20 @@ span.dice-roll-result + span.dice-roll-result {
 .nav {
   margin-top: 5px;
   margin-bottom: 15px;
+  padding-right: 0;
+}
+
+.-flexd-rr {
+  flex-direction: row-reverse;
+}
+
+.-mh-mc {
+  max-height: min-content;
+}
+
+.-lr-marg-auto {
+  margin-left:auto;
+  margin-right:auto;
 }
 
 html {

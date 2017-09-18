@@ -651,7 +651,7 @@ function addUseDiceFromPool(dId) {
     return;
   }
 //debugger;
-  var newUseDice = $("<div>").addClass("input-group mb-1 -minh35").append(
+  var newUseDice = $("<div>").addClass("input-group mb-1 -minh35 col-10 -lr-marg-auto").append(
 
     $("<span>").addClass("input-group-addon dice_count_label").text(___dice[dId].label).css(
       {"color": getTextColor(___dice[dId].color), "background-color":___dice[dId].color }
