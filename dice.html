@@ -26,7 +26,7 @@
         <div class="">
           <div class="container-fluid h100 d-flex flex-column">
             <div class="col-10 -lr-marg-auto -mh-mc">
-              <ul class="nav nav-pills d-flex flex-sm-row flex-column -flex0" roll="tablist">
+              <ul id="navBar" class="nav nav-pills d-flex flex-sm-row flex-column -flex0 collapse show" roll="tablist">
                 <li class="nav-item"><a class="nav-link active" data-toggle="tab" href="#diceCount">Dice</a></li>
                 <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#diceEdit">Edit Dice</a></li>
               </ul>
@@ -37,7 +37,7 @@
               <div id="diceCount" class="tab-pane h100 fade show active" roll="tabpanel">
                 <div class="d-flex flex-column h100">
                   <!--div class="d-flex -flex1 h100"-->
-                    <div class="-flex1 scroll-y">
+                    <div id="diceCountScroll" class="-flex1 scroll-y">
                       <form id="dices" >
 
                       </form>
@@ -146,7 +146,7 @@
               <div id="diceEdit" class="tab-pane fade h100" roll="tabpanel">
                 <div class="d-flex flex-column h100">
                   <div class="d-flex -flex1 h100">
-                    <div class="-flex1 col-10 -lr-marg-auto scroll-y">
+                    <div id="diceEditScroll" class="-flex1 col-10 -lr-marg-auto scroll-y">
                       <div id="dicePool" class="d-flex -flex-wrap -flex1">
 
                       </div>

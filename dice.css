@@ -28,6 +28,17 @@ span.dice-roll-result + span.dice-roll-result {
   }
 }
 
+@media (max-width: 576px) {
+  .collapse {
+    display: none!important;
+
+  }
+
+  .collapse.show.d-flex {
+    display:flex!important;
+  }
+}
+
 .fa-eye-slash {
   color: firebrick;
 }
@@ -47,6 +58,8 @@ span.dice-roll-result + span.dice-roll-result {
 @media (max-width: 765px) {
 
 }
+
+
 
 .scroll-y {
   overflow-y: auto;

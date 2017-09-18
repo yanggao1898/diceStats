@@ -770,6 +770,19 @@ function editDicePoolEntry(e) {
   $("#diceEditBody").append(modalTableDiv);
 }
 
+function hideTabOnScroll(e) {
+  var el = $(e.currentTarget);
+  var tabsTop = $("#tabs").offset().top;
+  if (el.scrollTop() > 5) {
+    if($(window).scrollTop() + $(window).height() < $(document).height()) {
+      if($(document).scrollTop() < tabsTop) {
+        $(document.body).animate( {'scrollTop' : tabsTop}, 100);
+      }
+    }
+
+  }
+}
+
 function modalHide() {
   $("#diceEditHeader").empty();
   $("#diceEditBody").empty();
@@ -932,6 +945,9 @@ function init() {
   $("#diceEditModal").on("change", ".modal-table-sym-entry", modalValSymChange);
   $("#diceEditModal").on("change", ".pick_color", updateColors);
   $("#clearRollBtn").click(clearRolls);
+
+  $("#diceCountScroll").scroll(hideTabOnScroll);
+  //$("#diceCountScroll").promise().done()
 
   /*
   $('a[data-toggle="tab"][href="#diceEdit"]').on("shown.bs.tab", function(e) {
