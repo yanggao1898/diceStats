@@ -1,6 +1,6 @@
-var ___dice = {};
+var ___dice = {"dice" : {}, "settings" : {}, "meta" : {}};
 var ___stats = {};
-var ___dicePageSettings = {}
+//var ___dicePageSettings = {}
 
 String.prototype.hashCode = function() {
   var hash = 0, i, chr;
@@ -40,12 +40,12 @@ function rollDice() {
       dId = diceCount[i][0]
       for (var j = 0; j < diceCount[i][1]; j++) {
         // does the actual roll
-        rollIdx = Math.floor(___rngesus() * ___dice[dId].numFaces);
-        if(___dice[dId].faces && ___dice[dId].faces.length) {
-          dVal.push(___dice[dId].faces[rollIdx]);
+        rollIdx = Math.floor(___rngesus() * ___dice.dice[dId].numFaces);
+        if(___dice.dice[dId].faces && ___dice.dice[dId].faces.length) {
+          dVal.push(___dice.dice[dId].faces[rollIdx]);
         }
-        if(___dice[dId].symbols && ___dice[dId].symbols.length) {
-          dSym.push(___dice[dId].symbols[rollIdx]);
+        if(___dice.dice[dId].symbols && ___dice.dice[dId].symbols.length) {
+          dSym.push(___dice.dice[dId].symbols[rollIdx]);
         }
       }
       dReturn.push({"dId" : dId, "dVal" : dVal.slice(), "dSym" : dSym.slice()} );
@@ -72,7 +72,7 @@ function displayRolls(diceResult) {
   for (var i = 0; i < diceResult.length; i++) {
     subTot = 0;
     dId = diceResult[i].dId;
-    bgCol = ___dice[dId].color;
+    bgCol = ___dice.dice[dId].color;
     color = getTextColor(bgCol);
     diceColorCss = {"background-color":bgCol, "color":color }
     for (var j = 0; j < Math.max(diceResult[i].dVal.length, diceResult[i].dSym.length); j++) {
@@ -154,7 +154,7 @@ function convertSymbols(syms) {
           {"vertical-align": "middle"}
         );
         curSym = $("<span>");
-      } else if(___dicePageSettings.symbols.indexOf(curLi[j]) != -1) {
+      } else if(___dice.settings.symbols.indexOf(curLi[j]) != -1) {
         // is an approved font-awesome icon
         faArr.forEach(function(el) {
           curSym.addClass(el);
@@ -253,7 +253,7 @@ function calculateDice(e) {
 
   for (i = 0; i < diceCount.length; i++) {
     for (var j = 0; j < diceCount[i][1]; j++) {
-      workArr.push(___dice[diceCount[i][0]].faces.slice());
+      workArr.push(___dice.dice[diceCount[i][0]].faces.slice());
     }
   }
 
@@ -521,7 +521,7 @@ function processAddDiceMenu(e) {
 
     var dId = dType + (new Date()).valueOf() + Math.random();
     dId = dType + "_" + dId.hashCode();
-    while (dId in ___dice) {
+    while (dId in ___dice.dice) {
       dId = dType + "_" + (dId + Math.random()).hashCode();
     }
     //console.log(dName);
@@ -534,6 +534,9 @@ function processAddDiceMenu(e) {
 
     // ADD DICE TO DICECOUNT TAB
     addUseDiceFromPool(dId);
+
+    // SCROLL EDIT PANE TO SHOW NEW DICE
+    $("#diceEditScroll").scrollTop($("#"+dId).offset().top)
   }
 }
 
@@ -543,7 +546,7 @@ function addDiceToNS(dId, dLabel, dSides) {
   for (var i = 1; i <= dSides; i++) {
     range.push(i);
   }
-  ___dice[dId] = {
+  ___dice.dice[dId] = {
     "label" : dLabel,
     "numFaces" : dSides,
     "faces" : range,
@@ -555,9 +558,9 @@ function addDiceToNS(dId, dLabel, dSides) {
 }
 
 function createDicePoolEntry(id) {
-  var label = ___dice[id].label;
-  var sides = ___dice[id].faces;
-  var color = ___dice[id].color;
+  var label = ___dice.dice[id].label;
+  var sides = ___dice.dice[id].faces;
+  var color = ___dice.dice[id].color;
 
   var dPDiv = $("<div>").addClass("input-group mb-2 dice_pool_entry").attr("id", id);
   var dL = $("<span>").addClass("input-group-addon -flex1 dice_pool_entry_label").text(label).css(
@@ -565,7 +568,7 @@ function createDicePoolEntry(id) {
   );
 
   //var fACbIcon = ___dice[id].visible ? "fa-check-square-o" : "fa-square-o";
-  var fACbIcon = ___dice[id].visible ? "fa-eye" : "fa-eye-slash";
+  var fACbIcon = ___dice.dice[id].visible ? "fa-eye" : "fa-eye-slash";
 
   var dFACb = $("<span>").addClass("input-group-addon dice_pool_use").append(
     $("<i>").addClass("fa fa-fw " + fACbIcon)
@@ -620,7 +623,7 @@ function toggleUseDiceFromPool(e) {
   var togTarget = e.target.closest("div.dice_pool_entry");
   var dId = togTarget.id;
   //debugger;
-  ___dice[dId].visible = !___dice[dId].visible;
+  ___dice.dice[dId].visible = !___dice.dice[dId].visible;
   var targ;
   if ($(e.target).is("span")) {
     targ = $(e.target).find("i.fa");
@@ -633,7 +636,7 @@ function toggleUseDiceFromPool(e) {
 
 
   //___dice[dId].visible = e.target.checked;
-  if (___dice[dId].visible) {
+  if (___dice.dice[dId].visible) {
     // after clicking checkbox, checkbox is checked
     addUseDiceFromPool(dId);
   }
@@ -647,14 +650,14 @@ function toggleUseDiceFromPool(e) {
 }
 
 function addUseDiceFromPool(dId) {
-  if(!___dice[dId].visible) {
+  if(!___dice.dice[dId].visible) {
     return;
   }
 //debugger;
   var newUseDice = $("<div>").addClass("input-group mb-1 -minh35 col-10 -lr-marg-auto").append(
 
-    $("<span>").addClass("input-group-addon dice_count_label").text(___dice[dId].label).css(
-      {"color": getTextColor(___dice[dId].color), "background-color":___dice[dId].color }
+    $("<span>").addClass("input-group-addon dice_count_label").text(___dice.dice[dId].label).css(
+      {"color": getTextColor(___dice.dice[dId].color), "background-color":___dice.dice[dId].color }
     )
   ).append(
     $("<input>").addClass("form-control").attr(
@@ -671,16 +674,16 @@ function delUseDiceFromPool(dId) {
 
 function deleteDicePoolEntry(e) {
   var delTarget = e.target.closest("div.dice_pool_entry");
-  var delId = delTarget.id;
+  var dId = delTarget.id;
 
   // REMOVE FROM DICECOUNT TAB
-  delUseDiceFromPool(delId);
+  delUseDiceFromPool(dId);
 
   // DELETE FROM DICEEDIT TAB
   $(delTarget).remove();
 
   // DELETE GLOBAL NS ENTRY
-  delete ___dice[delId];
+  delete ___dice.dice[dId];
   storeLS();
 }
 
@@ -693,21 +696,21 @@ function editDicePoolEntry(e) {
     $("<div>").addClass("container col-12").append(
       $("<div>").addClass("row").append(
         $("<div>").addClass("col-4").append(
-          $("<h5>").addClass("modal-title").text("Dice Name: ")
+          $("<h5>").addClass("modal-title").text("Name: ")
         )
       ).append(
         $("<div>").addClass("col-8").append(
           $("<input>").attr(
             {"id":"modalDiceEditLabel", "data-dice_id":dieId, "type":"text"}
-          ).addClass("form-control").val(___dice[dieId].label).css(
-            {"color": getTextColor(___dice[dieId].color), "background-color":___dice[dieId].color }
+          ).addClass("form-control").val(___dice.dice[dieId].label).css(
+            {"color": getTextColor(___dice.dice[dieId].color), "background-color":___dice.dice[dieId].color }
           )
         )
       )
     ).append(
       $("<div>").addClass("row").append(
         $("<div>").addClass("col-4").append(
-          $("<h6>").text("Dice Color: ")
+          $("<h6>").text("Color: ")
         )
       ).append(
         $("<div>").addClass("col-3").append(
@@ -726,25 +729,25 @@ function editDicePoolEntry(e) {
   $(".pick_color").spectrum({
     preferredFormat: "name",
 		showPalette:true,
-    color: ___dice[dieId].color,
+    color: ___dice.dice[dieId].color,
     hideAfterPaletteSelect:true,
   });
 
-  var numFaces = ___dice[dieId].numFaces;
-  var diceFaces = ___dice[dieId].faces ? ___dice[dieId].faces : new Array(numFaces).fill(0);
-  var diceSyms = ___dice[dieId].symbols ? ___dice[dieId].symbols : new Array(numFaces).fill(null);
+  var numFaces = ___dice.dice[dieId].numFaces;
+  var diceFaces = ___dice.dice[dieId].faces ? ___dice.dice[dieId].faces : new Array(numFaces).fill(0);
+  var diceSyms = ___dice.dice[dieId].symbols ? ___dice.dice[dieId].symbols : new Array(numFaces).fill(null);
 
   var modalTableDiv = $("<div>").addClass("table-responsive").attr(
     {"id": "modalTableDiv", "data-dice_id":dieId}
   );
-  var modalTable = $("<table>").addClass("table table-striped").attr("id", "modalTable").append(
+  var modalTable = $("<table>").addClass("table table-responsive table-striped").attr("id", "modalTable").append(
     $("<thead>").append(
       $("<tr>").append(
-        $("<td>").text("Dice Face")
+        $("<th>").text("Face")
       ).append(
-        $("<td>").text("Value")
+        $("<th>").text("Value")
       ).append(
-        $("<td>").text("Symbol")
+        $("<th>").text("Symbol")
       )
     )
   );
@@ -756,7 +759,7 @@ function editDicePoolEntry(e) {
         $("<td>").text(i+1)
       ).append(
         $("<td>").append(
-          $("<input>").addClass("modal-table-val-entry").attr("data-didx", i).val(diceFaces[i])
+          $("<input>").addClass("modal-table-val-entry -edit-dice-val").attr({"data-didx": i, "type": "number" }).val(diceFaces[i])
         )
       ).append(
         $("<td>").append(
@@ -766,21 +769,63 @@ function editDicePoolEntry(e) {
     );
   }
 
-  modalTableDiv.append(modalTable.append(tBody));
+  var modalDoneBtn = $("<div>").addClass("d-flex -flex1 -flexd-rr").append(
+    $("<button>").addClass("btn btn-primary").attr({"data-dismiss": "modal", "type": "button"}).text("Done")
+  );
+
+  modalTableDiv.append(modalTable.append(tBody)).append(modalDoneBtn);
+  //modalTableDiv.append(modalDoneBtn);
   $("#diceEditBody").append(modalTableDiv);
 }
 
+var ___lastSTop = 0;
+
 function hideTabOnScroll(e) {
+
+
   var el = $(e.currentTarget);
   var tabsTop = $("#tabs").offset().top;
+
+  var st = el.scrollTop(); // Credits: "https://github.com/qeremy/so/blob/master/so.dom.js#L426"
+  if (st > ___lastSTop){
+    if($("#dices").outerHeight(true) < $("#diceCountScroll").height()) {
+      return;
+    }
+    // downscroll code
+    if($(window).scrollTop() + $(window).height() < $(document).height()) {
+
+    }
+
+    if (st < el.outerHeight(true)) {
+      $("#diceCountScroll").css({"overflow-y" : "hidden"});
+      $("#diceGrowDiv").height("calc(100% + " + st + "px)");
+      $(document.body).scrollTop(st);
+      //$("#diceCountScroll").scrollTop(___lastSTop);
+      e.preventDefault();
+      e.stopPropagation();
+      $("#diceCountScroll").css({"overflow-y" : "auto"});
+      return false;
+
+    }
+
+
+
+
+  } else {
+    // upscroll code
+  }
+  ___lastSTop = st;
+
+/*
   if (el.scrollTop() > 5) {
     if($(window).scrollTop() + $(window).height() < $(document).height()) {
       if($(document).scrollTop() < tabsTop) {
         $(document.body).animate( {'scrollTop' : tabsTop}, 100);
+
       }
     }
-
   }
+  */
 }
 
 function modalHide() {
@@ -792,7 +837,7 @@ function modalHide() {
 function modalLabelChange(e) {
   var dId = $("#modalDiceEditLabel").data("dice_id");
   var newDiceLabel = $("#modalDiceEditLabel").val();
-  ___dice[dId].label = newDiceLabel;
+  ___dice.dice[dId].label = newDiceLabel;
 
   if ($("#" + dId + "_count" ).length) {
     $("#" + dId + "_count" ).prevAll("span").text(newDiceLabel);
@@ -808,9 +853,9 @@ function modalValSymChange(e) {
   var targClass = $(e.target).attr("class");
 
   if(targClass.indexOf("sym") > -1) {
-    ___dice[dVal].symbols[dIdx] = $(e.target).val();
+    ___dice.dice[dVal].symbols[dIdx] = $(e.target).val();
   } else if (targClass.indexOf("val") > -1) {
-    ___dice[dVal].faces[dIdx] = parseInt($(e.target).val());
+    ___dice.dice[dVal].faces[dIdx] = parseInt($(e.target).val());
   }
 }
 
@@ -819,7 +864,7 @@ function modalSymbolChange(e) {
   var dIdx = $(e.target).data("didx");
   var dVal = $(e.target).closest("[data-dice_id]").data("dice_id");
 
-  ___dice[dVal].symbols[dIdx] = parseInt($(e.target).val());
+  ___dice.dice[dVal].symbols[dIdx] = parseInt($(e.target).val());
 }
 
 function getTextColor(bgc) {
@@ -860,12 +905,12 @@ function parsergbStr(rgbStr) {
 
 function updateColors(e) {
   var dId = $(e.target).data("dice_id");
-  ___dice[dId].color = $(e.target).spectrum("get").toString();
+  ___dice.dice[dId].color = $(e.target).spectrum("get").toString();
   //debugger;
-  var cssObj = {"color": getTextColor(___dice[dId].color), "background-color":___dice[dId].color };
+  var cssObj = {"color": getTextColor(___dice.dice[dId].color), "background-color":___dice.dice[dId].color };
   $("#modalDiceEditLabel").css(cssObj);
   $("#"+dId + " .dice_pool_entry_label").css(cssObj);
-  $("#" + dId + "_count").prevAll("span").css(cssObj);
+  $("#"+dId + "_count").prevAll("span").css(cssObj);
 }
 
 function storeLS() {
@@ -875,12 +920,15 @@ function storeLS() {
 function restoreLS() {
   // compatibility check
   function compatCheck(tmp) {
-    if (!tmp.d6_DarkSouls_black.symbols) {
+    if (!tmp.meta || !tmp.meta.version || tmp.meta.version < ___dice.meta.version) {
       return false;
     }
-    if (tmp.d6_DarkSouls_black.visible == undefined) {
+    /*if (!tmp.d6_DarkSouls_black || !tmp.d6_DarkSouls_black.symbols) {
       return false;
     }
+    if (!tmp.d6_DarkSouls_black || tmp.d6_DarkSouls_black.visible == undefined) {
+      return false;
+    }//*/
 
     return true;
   }
@@ -897,18 +945,19 @@ function initializeRandom() {
 }
 
 function initializeSymbols() {
-  ___dicePageSettings.symbols = ["fa-sun-o", "fa-diamond", "fa-cog", "fa-gear"];
+  ___dice.settings.symbols = ["fa-sun-o", "fa-diamond", "fa-cog", "fa-gear"];
 }
 
 function init() {
-  ___dice.d6_DarkSouls_black = {"label" : "Black", "numFaces": 6, "faces" : [0, 1, 1, 1, 2, 2], "symbols" : new Array(6).fill(null), "color": "black", "visible": true}
-  ___dice.d6_DarkSouls_blue = {"label" : "Blue", "numFaces": 6, "faces" : [1, 2, 2, 2, 3, 3], "symbols" : new Array(6).fill(null), "color" : "blue", "visible": true}
-  ___dice.d6_DarkSouls_orange = {"label" : "Orange", "numFaces": 6, "faces" : [1, 2, 2, 3, 3, 4], "symbols" : new Array(6).fill(null), "color": "orange", "visible": true}
+  ___dice.dice.d6_DarkSouls_black = {"label" : "DS-Black", "numFaces": 6, "faces" : [0, 1, 1, 1, 2, 2], "symbols" : new Array(6).fill(null), "color": "black", "visible": true}
+  ___dice.dice.d6_DarkSouls_blue = {"label" : "DS-Blue", "numFaces": 6, "faces" : [1, 2, 2, 2, 3, 3], "symbols" : new Array(6).fill(null), "color" : "blue", "visible": true}
+  ___dice.dice.d6_DarkSouls_orange = {"label" : "DS-Orange", "numFaces": 6, "faces" : [1, 2, 2, 3, 3, 4], "symbols" : new Array(6).fill(null), "color": "orange", "visible": true}
 
-  ___dice.d6_MassiveDarknes_red = {"label" : "Red", "numFaces": 6, "faces" : [0, 1, 1, 2, 2, 3], "symbols" : [,,,"fa-sun-o", "fa-sun-o", "fa-diamond"], "color": "orangered", "visible": true}
-  ___dice.d6_MassiveDarknes_yellow = {"label" : "Yellow", "numFaces": 6, "faces" : [0, 1, 1, 1, 1, 2], "symbols" : [,,,,,"fa-sun-o"], "color" : "gold", "visible": true}
-  ___dice.d6_MassiveDarknes_blue = {"label" : "Blue", "numFaces": 6, "faces" : [0, 0, 1, 1, 1, 2], "symbols" : [,,,,,"fa-sun-o"], "color": "skyblue", "visible": true}
-  ___dice.d6_MassiveDarknes_green = {"label" : "Green", "numFaces": 6, "faces" : [0, 0, 1, 2, 2, 3], "symbols" : [,,,"fa-sun-o", "fa-sun-o", "fa-diamond"], "color": "lawngreen", "visible": true}
+  ___dice.dice.d6_MassiveDarknes_red = {"label" : "MD-Red", "numFaces": 6, "faces" : [0, 1, 1, 2, 2, 3], "symbols" : [,,,"fa-sun-o", "fa-sun-o", "fa-diamond"], "color": "orangered", "visible": true}
+  ___dice.dice.d6_MassiveDarknes_yellow = {"label" : "MD-Yellow", "numFaces": 6, "faces" : [0, 1, 1, 1, 1, 2], "symbols" : [,,,,,"fa-sun-o"], "color" : "gold", "visible": true}
+  ___dice.dice.d6_MassiveDarknes_blue = {"label" : "MD-Blue", "numFaces": 6, "faces" : [0, 0, 1, 1, 1, 2], "symbols" : [,,,,,"fa-sun-o"], "color": "skyblue", "visible": true}
+  ___dice.dice.d6_MassiveDarknes_green = {"label" : "MD-Green", "numFaces": 6, "faces" : [0, 0, 1, 2, 2, 3], "symbols" : [,,,"fa-sun-o", "fa-sun-o", "fa-diamond"], "color": "lawngreen", "visible": true}
+  ___dice.meta.version = 0.1;
 
   if(localStorage.userDice) {
     restoreLS();
@@ -919,7 +968,7 @@ function init() {
   initializeRandom();
   initializeSymbols();
 
-  var diceKeys = Object.keys(___dice);
+  var diceKeys = Object.keys(___dice.dice);
   var dEntry;
   diceKeys.forEach(function (dId) {
     $("#dicePool").append(createDicePoolEntry(dId));
@@ -946,7 +995,7 @@ function init() {
   $("#diceEditModal").on("change", ".pick_color", updateColors);
   $("#clearRollBtn").click(clearRolls);
 
-  $("#diceCountScroll").scroll(hideTabOnScroll);
+  //$("#diceCountScroll").on("scroll", _.throttle(hideTabOnScroll, 50));
   //$("#diceCountScroll").promise().done()
 
   /*
