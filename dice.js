@@ -13,6 +13,10 @@ String.prototype.hashCode = function() {
   return hash;
 };
 
+function ___Benchmark() {
+
+}
+
 // roll each of the dice a number of times
 function rollDice() {
   // get all the visible dice's IDs from the DOM
@@ -239,20 +243,6 @@ function calculateDice(e) {
     dVal = dVal < 0 ? 0 : dVal;
     diceCount.push([allDices[i], dVal]);
   }
-  //var numBlk = parseInt($("#black").val()) || 0;
-  //var numBlu = parseInt($("#blue").val()) || 0;
-  //var numOrg = parseInt($("#orange").val()) || 0;
-  //var numSum = numBlk + numBlu + numOrg;
-  /*
-  if (numSum > 10) {
-    alert("Please use less dice (<= 10)");
-    e.target.value = 0;
-    //debugger;
-    //alert(e.target);
-    return;
-  }
-
-  //*/
 
   for (i = 0; i < diceCount.length; i++) {
     for (var j = 0; j < diceCount[i][1]; j++) {
@@ -278,6 +268,9 @@ function calculateDice(e) {
         step0Idx.push(tmpArr[i]);
       }
     }
+    step0Idx.forEach( function(el) {
+      step0[el] = Big(step0[el]);
+    });
     finalStep = step0;
     finalIdx = step0Idx;
     steps[0] = {"idx": step0Idx, "val": step0};
@@ -291,6 +284,8 @@ function calculateDice(e) {
   var sIdxi;
   var tmpStpVal;
 
+  var __t1 = performance.now();
+
   for (i = 0; i < workArr.length; i++ ) {
     stepx = {};
     stepxArr = workArr[i];
@@ -302,9 +297,9 @@ function calculateDice(e) {
       for (sIdxi = 0; sIdxi < prevStep.idx.length; sIdxi++) {
         tmpStpVal = stepxArr[si] + prevStep.idx[sIdxi];
         if (tmpStpVal in stepx) {
-          stepx[tmpStpVal] += prevStep.val[prevStep.idx[sIdxi]];
+          stepx[tmpStpVal] = stepx[tmpStpVal].plus(prevStep.val[prevStep.idx[sIdxi]]);
         } else {
-          stepx[tmpStpVal] = prevStep.val[prevStep.idx[sIdxi]];
+          stepx[tmpStpVal] = new Big(prevStep.val[prevStep.idx[sIdxi]]);
           stepxIdx.push(tmpStpVal);
         }
       }
@@ -313,10 +308,14 @@ function calculateDice(e) {
     steps[i+1] = {"idx": stepxIdx, "val": stepx}
 
     if (i == workArr.length-1) {
-      finalStep = stepx;
+      finalStep = stepx;  // Array of Big() numbers
       finalIdx = stepxIdx;
     }
   }
+
+  var __t2 = performance.now();
+
+  console.log("DURATION: " + (__t2-__t1));
 
   var range, mean, median, mode;
   var stdev;
@@ -344,8 +343,8 @@ function calculateDice(e) {
   }
   //$("#rangeData").text(range ? range[0] + " - " + range[1] : "No Range");
 
-  if (parseInt(mean)) {
-    $("#meanData").text(mean);
+  if (mean && parseInt(mean.toString())) {
+    $("#meanData").text(mean.toString());
     ___stats.mean = mean;
   } else {
     $("#meanData").text("No Mean");
@@ -353,7 +352,7 @@ function calculateDice(e) {
   //$("#meanData").text(mean ? mean : "No Mean");
 
   if (median && median.length > 0) {
-    $("#medianData").text(median[0] + " @ " + Math.round(median[1] * 100) + " %");
+    $("#medianData").text(median[0] + " @ " + median[1].times(100).round().toString() + " %");
   } else {
     $("#medianData").text("No Median");
   }
@@ -362,10 +361,10 @@ function calculateDice(e) {
                           : "No Median");
   //*/
   if (mode && mode.length > 0) {
-    var mText = mode[0][0] + " @ " + Math.round(mode[0][1] * 10000)/100 + " %";
+    var mText = mode[0][0] + " @ " + mode[0][1].times(10000).round().div(100).toString() + " %";
 
     for (i = 1; i < mode.length; i++) {
-      mText += ", " + mode[i][0] + " @ " + Math.round(mode[i][1] * 10000)/100 + " %";
+      mText += ", " + mode[i][0] + " @ " + mode[i][1].times(10000).round().div(100).toString() + " %";
     }
     $("#modeData").text(mText);
   } else {
@@ -385,6 +384,7 @@ function calculateDice(e) {
   //*/
   if (parseInt(stdev)) {
     $("#stdevData").text(stdev);
+    ___stats.stdev = stdev;
   } else {
     $("#stdevData").text("No Standard Deviation");
   }
@@ -393,79 +393,87 @@ function calculateDice(e) {
   //debugger;
 }
 
+// Long way to calculate Mean
+// (Short way is to just add up the individual means)
 function cmean(idx, set) {
-  var sum = 0;
-  var count = 0;
+  var sum = new Big(0);
+  var count = new Big(0);
 
   idx.forEach(function (el) {
 
 
-    sum += set[el] * el;
-    count += set[el];
+    sum = sum.plus(set[el].times(el));// += set[el] * el;
+    count = count.plus(set[el]);// += set[el];
 
   });
 
-  return (sum/count).toFixed(2);
+  return (sum.div(count).round(2));//(sum/count).toFixed(2);
 }
 
 function cmedian(idx, set) {
-  var count = 0;
+  var count = new Big(0);
   var median;
   var mid;
   idx.forEach(function (el) {
-    count += set[el];
+    count= count.add(set[el]);// += set[el];
   });
 
-  mid = [count/2];
-  if (mid[0] != Math.round(mid[0])) {
-    mid = [Math.floor(mid), Math.ceil(mid)];
+  mid = [count.div(2)];
+  if (!mid[0].eq(mid[0].round())) {
+    BigU = Big();
+    BigD = Big();
+    BigU.RM = 3;
+    BigD.RM = 0;
+
+
+    mid = [BigD(mid[0]).round(), BigU(mid[0]).round()];
   }
 
-  var counter = 0;
+  var counter = new Big(0);
   if (mid.length == 1) {
     for(var i = 0; i < idx.length; i++) {
       el = idx[i]
-      if (set[el] + counter >= mid[0]) {
-        median = [el, 1 - counter/count];
+      if (set[el].plus(counter).gte(mid[0])) {
+        median = [el, Big(1).minus(Big(counter).div(count))];
         break;
       }
-      counter += set[el];
+      counter = counter.plus(set[el]);// += set[el];
     }
   } else {
     var first = false;
     var last = false;
     for(var i = 0; i < idx.length; i++) {
       el = idx[i]
-      if (set[el] + counter >= mid[0] && first == false) {
-        first = [el, counter/count];
+      if (set[el].plus(counter).gte(mid[0]) && first == false) {
+        first = [el, counter.div(count)];
       }
-      if (set[el] + counter >= mid[1] && last == false) {
-        last = [el, counter/count];
+      if (set[el].plus(counter).gte(mid[1]) && last == false) {
+        last = [el, counter.div(count)];
       }
       if (first != false && last != false) {
         break;
       }
-      counter += set[el];
+      counter = counter.plus(set[el]);// += set[el];
     }
-    median = [(first[0] + last[0])/2, 1 - (first[1] + last[1])/2];
+    median = [(first[0] + last[0])/2, Big(1).minus(first[1].plus(last[1]).div(2))];
   }
   return median;
 }
 
 function cmode(idx, set) {
-  var count = 0;
+  var count = Big(0);
   var mode = [[0,0]];
   idx.forEach(function (el) {
-    count += set[el];
-    if (set[el] > mode[0][1]) {
+    count = count.plus(set[el]);
+    if (set[el].gt(mode[0][1])) {
       mode = [[el, set[el]]];
-    } else if (set[el] == mode[0][1]) {
+    } else if (set[el].eq(mode[0][1])) {
       //debugger;
       mode.push([el, set[el]]);
     }
   });
   for(var i = 0; i < mode.length; i++) {
-    mode[i][1] = mode[i][1]/count;
+    mode[i][1] = mode[i][1].div(count);
   }
 
   return mode;
