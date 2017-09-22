@@ -63,8 +63,8 @@
                 </div>
 
                 <div class="container-fluid mt-1" id="displayDiv">
-                  <div class"container-fluid" id="rollsDiv">
-                    <div class="row" id="rollTable">
+                  <div id="rollsDiv">
+                    <div class="row justify-content-center" id="rollTable">
                       <div class="col-10">
                         <h4 id="diceRollResultDiv">
                           <!--<span class="badge" style="color:blue;background-color:red">4</span>-->
@@ -72,66 +72,67 @@
                       </div>
                     </div>
                     <div class="row justify-content-center">
-                      <div class="col">
-                        <div class="row justify-content-end mb-1" id="clearRollTableRow">
-                          <div class="col col-auto md-auto"> </div>
-                          <div class="col col-auto">
-                            <button id="clearRollBtn" type="button" class="btn btn-primary -minh35" style="display: none">
-                              Clear Rolls
-                            </button>
-                          </div>
+                      <div class="col-10">
+                        <div class="d-flex -flexd-rr mb-1" id="clearRollTableRow">
+                          <button id="clearRollBtn" type="button" class="btn btn-primary -minh35" style="display: none">
+                            Clear Rolls
+                          </button>
                         </div>
                       </div>
                     </div>
                   </div>
-                  <div class="container-fluid" id="statsDiv">
-                    <table class="table show-in-lg" id="statTable">
-                      <tbody>
-                        <tr id="range">
-                          <td id="rangeLabel">
-                            Range
-                          </td>
-                          <td id="rangeData">
-                            No Range
-                          </td>
-                        </tr>
-                        <tr id="mean">
-                          <td id="meanLabel">
-                            Mean
-                          </td>
-                          <td id="meanData">
-                            No Mean
-                          </td>
-                        </tr>
-                        <tr id="median">
-                          <td id="medianLabel">
-                            Median
-                          </td>
-                          <td id="medianData">
-                            No Median
-                          </td>
-                        </tr>
-                        <tr id="mode">
-                          <td id="modeLabel">
-                            Mode
-                          </td>
-                          <td id="modeData">
-                            No Mode
-                          </td>
-                        </tr>
-                        <tr id="stdev">
-                          <td id="stdevLabel">
-                            Standard Deviation
-                          </td>
-                          <td id="stdevData">
-                            No Standard Deviation
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                    <div class="footer row" id="statsToggleBtnDiv">
-                      <div class="col">
-                        <button type="button" class="btn btn-secondary btn-block" id="statsToggleBtn"> </button>
+                  <div class="" id="statsDiv">
+                    <div class="row justify-content-center">
+                      <div class="col-10">
+                        <table class="table show-in-lg" id="statTable">
+                          <tbody>
+                            <tr id="range">
+                              <td class="-tbl-lbl" id="rangeLabel">
+                                Range
+                              </td>
+                              <td id="rangeData">
+                                No Range
+                              </td>
+                            </tr>
+                            <tr id="mean">
+                              <td class="-tbl-lbl" id="meanLabel">
+                                Mean
+                              </td>
+                              <td id="meanData">
+                                No Mean
+                              </td>
+                            </tr>
+                            <tr id="median">
+                              <td class="-tbl-lbl" id="medianLabel">
+                                Median
+                              </td>
+                              <td id="medianData">
+                                No Median
+                              </td>
+                            </tr>
+                            <tr id="mode">
+                              <td class="-tbl-lbl" id="modeLabel">
+                                Mode
+                              </td>
+                              <td id="modeData">
+                                No Mode
+                              </td>
+                            </tr>
+                            <tr id="stdev">
+                              <td class="-tbl-lbl" id="stdevLabel">
+                                Standard Deviation
+                              </td>
+                              <td id="stdevData">
+                                No Standard Deviation
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                        <div class="footer row" id="statsToggleBtnDiv">
+                          <div class="col">
+                            <button type="button" class="btn btn-secondary btn-block" id="statsToggleBtn"> </button>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
