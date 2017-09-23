@@ -15,6 +15,80 @@ String.prototype.hashCode = function() {
 
 function ___Benchmark() {
 
+  var test = new Big(10);
+  var timTmp = new Big(5);
+  var minTmp = new Big(317);
+  var divTmp = new Big(1039);
+  var t1, t2;
+  var tmp;
+
+  var results = {};
+  var p, m, t, d, eq;
+  var u1 = performance.now();
+  for (var i = 0; i < 300; i++) {
+    //console.log("Loop "+ i);
+    results[i] = {};
+    tmp = test.pow(i);
+
+    // test +
+    t1 = performance.now()
+    for (p = 0; p < 100; p++) {
+      tmp.plus(tmp);
+    }
+    t2 = performance.now();
+    results[i]["+"] = t2-t1;
+    //console.log("  + done");
+
+    // test -
+    t1 = performance.now()
+    for (m = 0; m < 100; m++) {
+      tmp.minus(minTmp);
+    }
+    t2 = performance.now();
+    results[i]["-"] = t2-t1;
+    //console.log("  - done");
+
+    // test *
+    t1 = performance.now()
+    for (t = 0; t < 100; t++) {
+      tmp.times(timTmp);
+    }
+    t2 = performance.now();
+    results[i]["*"] = t2-t1;
+    //console.log("  * done");
+
+    // test /
+    t1 = performance.now()
+    for (d = 0; d < 100; d++) {
+      tmp.div(divTmp);
+    }
+    t2 = performance.now();
+    results[i]["/"] = t2-t1;
+    //console.log("  / done");
+
+    // test eq
+    t1 = performance.now()
+    for (eq = 0; eq < 25; eq++) {
+      //console.log("    L "+ eq);
+      tmp = tmp.plus(tmp);
+      //console.log("    + done");
+      tmp = tmp.div(divTmp);
+      //console.log("    / done");
+      tmp = tmp.times(timTmp);
+      //console.log("    * done");
+      tmp = tmp.minus(minTmp);
+      //console.log("    - done");
+    }
+    t2 = performance.now();
+    results[i]["="] = t2-t1;
+    //console.log("  = done");
+
+  }
+  var u2 = performance.now();
+
+  console.log(results);
+  console.log("Total Run time: " + (u2-u1));
+
 }
 
 // roll each of the dice a number of times
@@ -1029,6 +1103,8 @@ function init() {
   } else {
     $("#statsToggleBtn").text("Show Stats");
   }
+
+  ___Benchmark();
 
 }
 
