@@ -359,7 +359,8 @@ function calculateDice(e) {
   var tmpStpVal;
 
   var __t1 = performance.now();
-
+  var __pCounter = 0;
+  var __aCounter = 0;
   for (i = 0; i < workArr.length; i++ ) {
     stepx = {};
     stepxArr = workArr[i];
@@ -372,8 +373,10 @@ function calculateDice(e) {
         tmpStpVal = stepxArr[si] + prevStep.idx[sIdxi];
         if (tmpStpVal in stepx) {
           stepx[tmpStpVal] = stepx[tmpStpVal].plus(prevStep.val[prevStep.idx[sIdxi]]);
+          __pCounter++;
         } else {
           stepx[tmpStpVal] = new Big(prevStep.val[prevStep.idx[sIdxi]]);
+          __aCounter++;
           stepxIdx.push(tmpStpVal);
         }
       }
@@ -390,6 +393,8 @@ function calculateDice(e) {
   var __t2 = performance.now();
 
   console.log("DURATION: " + (__t2-__t1));
+  console.log("PCounter: " + __pCounter);
+  console.log("ACounter: " + __aCounter);
 
   var range, mean, median, mode;
   var stdev;
