@@ -288,11 +288,13 @@ function resetDice() {
   });
   clearRolls();
   clearStats();
+
 }
 
 function clearRolls() {
   $("#diceRollResultDiv").empty();
   $("#clearRollBtn").hide();
+  $(document).scrollTop(0);
 }
 
 function clearStats() {
