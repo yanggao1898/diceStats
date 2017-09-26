@@ -141,6 +141,8 @@ function rollDice() {
   //console.log("roll resuls")
   //console.log(dReturn);
   displayRolls(dReturn);
+
+  $(document).scrollTop($("#rollDiceBtnGrp").position().top);
 }
 
 function displayRolls(diceResult) {
@@ -451,7 +453,7 @@ function calculateStats(finalIdx, finalStep) {
   //console.log("mean = " + mean);
   //console.log("median = " + median);
   //console.log("mode = " + mode);
-  console.log("std dev = " + stdev);
+  //console.log("std dev = " + stdev);
 
   if (range && range.length > 1) {
     $("#rangeData").text(range[0] + " - " + range[1]);
