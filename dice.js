@@ -451,7 +451,7 @@ function calculateStats(finalIdx, finalStep) {
   //console.log("mean = " + mean);
   //console.log("median = " + median);
   //console.log("mode = " + mode);
-  //console.log("std dev = " + stdev);
+  console.log("std dev = " + stdev);
 
   if (range && range.length > 1) {
     $("#rangeData").text(range[0] + " - " + range[1]);
@@ -500,7 +500,7 @@ function calculateStats(finalIdx, finalStep) {
     return "No Mode";
   })() );
   //*/
-  if (parseInt(stdev)) {
+  if (parseFloat(stdev)) {
     $("#stdevData").text(stdev);
     ___stats.stdev = stdev;
   } else {
