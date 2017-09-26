@@ -1,5 +1,32 @@
 var ___dice = {"dice" : {}, "settings" : {}, "meta" : {}};
 var ___stats = {};
+var ___profiler = (function() {
+  var avg = 0.01;
+  var perf = [];
+
+  function calcAvg() {
+    var ta = 0;
+    perf.forEach(function(el) {
+      ta += el;
+      avg = ta/perf.length;
+    });
+
+  }
+
+  return {
+    add: (sample) => {
+      if (perf.length < 5) {
+        perf.push(sample);
+      } else {
+        perf.shift();
+        perf.push(sample);
+      }
+      calcAvg();
+    },
+    getAvg: () => avg,
+    getPerf: () => perf
+  }
+})();
 //var ___dicePageSettings = {}
 
 String.prototype.hashCode = function() {
@@ -79,13 +106,23 @@ var ___bench = (function() {
   //console.log(results);
   console.log("Total Run time: " + pTot);
   console.log("Total operations: " + totCalc);
-  var mspc = pTot/totCalc;
+
+  var mspc = pTot*2/totCalc;
+  // the *2 is because the benchmark tests
+  // are roughly twice as fast as actual calculation speeds, so
+  // the *2 will compensate for that
 
   console.log("MSPC: " + mspc);
-  return mspc.toFixed(5);
+  ___profiler.add(Number.parseFloat(mspc.toFixed(5)));
+  return Number.parseFloat(mspc.toFixed(5));
 })();
 
 function ___Estimator(dFace, rolls) {
+  if (rolls <= 0) {
+    console.log("Rolls: " + rolls);
+    debugger;
+    return Big(0);
+  }
   var bF = Big(dFace);
   var bR = Big(rolls);
 
@@ -93,6 +130,8 @@ function ___Estimator(dFace, rolls) {
   var ans = bF.pow(2).times(0.5).minus(bF.times(0.5)).times(bR.pow(2)).minus(
     bF.pow(2).times(0.5).minus(bF.times(1.5)).times(bR)
   ).minus(bF);
+
+  console.log("For " + rolls + " d" + dFace + ": " + ans.toString() + " ops");
 
   return ans;
 }
@@ -307,11 +346,37 @@ function clearStats() {
 
 }
 
+function estimateTime() {
+  var allDices = $("#dices").find("[id]").map(function () {
+    return $(this).data("dice_id");
+  }).get();
+  var totOps = Big(0);
+
+  //var diceCount = [];
+  //var workArr = [];
+
+  for (var i = 0; i < allDices.length; i++) {
+    var dVal = parseInt($("#"+allDices[i]+"_count").val()) || 0;
+    dVal = dVal < 0 ? 0 : dVal;
+
+    if (dVal > 0) {
+      totOps = totOps.plus(___Estimator(___dice.dice[allDices[i]].numFaces, dVal));
+    }
+    //diceCount.push([allDices[i], dVal]);
+  }
+
+  console.log("Estimated Ops: " + totOps);
+
+  var time = Number.parseFloat(totOps.toString()) * ___profiler.getAvg();
+
+  return time;
+}
+
 function calculateDiceRaw(bench) {
   //console.log("started");
   //debugger;
 
-  ;
+  //;
   var allDices = $("#dices").find("[id]").map(function () {
     return $(this).data("dice_id");
   }).get();
@@ -324,13 +389,13 @@ function calculateDiceRaw(bench) {
     diceCount.push([allDices[i], dVal]);
   }
 
-  var totOps = 0;
+  //var totOps = 0;
 
   //for (i = 0; i < diceCount.length; i++) {}
 
 
   for (i = 0; i < diceCount.length; i++) {
-    totOps += ___Estimator(___dice.dice[diceCount[i][0]].numFaces, diceCount[i][1]);
+    //totOps += ___Estimator(___dice.dice[diceCount[i][0]].numFaces, diceCount[i][1]);
     for (var j = 0; j < diceCount[i][1]; j++) {
       workArr.push(___dice.dice[diceCount[i][0]].faces.slice());
     }
@@ -425,8 +490,15 @@ function calculateDiceRaw(bench) {
   var avgTime = (benchTime/benchIdx);
 
   console.log("Avg DURATION: " + (avgTime));
-  console.log("PCounter: " + __pCounter);
-  console.log("ACounter: " + __aCounter);
+  console.log("benchTime: " + benchTime);
+  //console.log("PCounter: " + __pCounter);
+  //console.log("ACounter: " + __aCounter);
+  console.log("Total Ops: " + (__pCounter + __aCounter));
+
+  if(benchTime > 25) {
+    var mspc = benchTime / (__pCounter+__aCounter);
+    ___profiler.add(Number.parseFloat(mspc.toFixed(5)));
+  }
 
   if (!bench) {
     return {"finalIdx": finalIdx, "finalStep": finalStep};
@@ -515,6 +587,16 @@ function calculateStats(finalIdx, finalStep) {
 }
 
 function calculateDice(e) {
+  var estTime = estimateTime();
+
+  /*
+  if (estTime > 1000) {
+    console.log("Estimated time required: " + estTime);
+    return;
+  }
+  */
+
+  console.log("Estimated time required: " + estTime);
   var diceStatsRaw = calculateDiceRaw();
 
   calculateStats(diceStatsRaw.finalIdx, diceStatsRaw.finalStep);
