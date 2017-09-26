@@ -13,7 +13,7 @@ String.prototype.hashCode = function() {
   return hash;
 };
 
-function ___Benchmark() {
+var ___bench = (function() {
 
   var test = new Big(10);
   var timTmp = new Big(5);
@@ -25,70 +25,76 @@ function ___Benchmark() {
   var results = {};
   var p, m, t, d, eq;
   var u1 = performance.now();
-  for (var i = 0; i < 300; i++) {
-    //console.log("Loop "+ i);
-    results[i] = {};
-    tmp = test.pow(i);
+  var pTot = 0;
+  var acum = 1;
+  var i, u2;
+  var totCalc = 0;
 
-    // test +
-    t1 = performance.now()
-    for (p = 0; p < 100; p++) {
-      tmp.plus(tmp);
+  while (pTot < 125) {
+    acum = acum * 2;
+    for (i = 0; i < acum; i++) {
+      //console.log("Loop "+ i);
+      //results[i] = {};
+      tmp = test.pow(i);
+
+      // test +
+      //t1 = performance.now()
+      for (p = 0; p < 100; p++) {
+        tmp.plus(tmp);
+      }
+      //t2 = performance.now();
+      //results[i]["+"] = t2-t1;
+      //console.log("  + done");
+
+      // test *
+      //t1 = performance.now()
+      for (t = 0; t < 100; t++) {
+        tmp.times(timTmp);
+      }
+      //t2 = performance.now();
+      //results[i]["*"] = t2-t1;
+      //console.log("  * done");
+
+      // test eq
+      //t1 = performance.now()
+      for (eq = 0; eq < 50; eq++) {
+        //console.log("    L "+ eq);
+        tmp = tmp.plus(tmp);
+        //console.log("    + done");
+        //tmp = tmp.div(divTmp);
+        //console.log("    / done");
+        tmp = tmp.times(timTmp);
+        //console.log("    * done");
+        //tmp = tmp.minus(minTmp);
+        //console.log("    - done");
+      }
     }
-    t2 = performance.now();
-    results[i]["+"] = t2-t1;
-    //console.log("  + done");
-
-    // test -
-    t1 = performance.now()
-    for (m = 0; m < 100; m++) {
-      tmp.minus(minTmp);
-    }
-    t2 = performance.now();
-    results[i]["-"] = t2-t1;
-    //console.log("  - done");
-
-    // test *
-    t1 = performance.now()
-    for (t = 0; t < 100; t++) {
-      tmp.times(timTmp);
-    }
-    t2 = performance.now();
-    results[i]["*"] = t2-t1;
-    //console.log("  * done");
-
-    // test /
-    t1 = performance.now()
-    for (d = 0; d < 100; d++) {
-      tmp.div(divTmp);
-    }
-    t2 = performance.now();
-    results[i]["/"] = t2-t1;
-    //console.log("  / done");
-
-    // test eq
-    t1 = performance.now()
-    for (eq = 0; eq < 25; eq++) {
-      //console.log("    L "+ eq);
-      tmp = tmp.plus(tmp);
-      //console.log("    + done");
-      tmp = tmp.div(divTmp);
-      //console.log("    / done");
-      tmp = tmp.times(timTmp);
-      //console.log("    * done");
-      tmp = tmp.minus(minTmp);
-      //console.log("    - done");
-    }
-    t2 = performance.now();
-    results[i]["="] = t2-t1;
-    //console.log("  = done");
-
+    u2 = performance.now();
+    pTot += u2-u1;
+    totCalc += 300*acum;
   }
-  var u2 = performance.now();
 
-  console.log(results);
-  console.log("Total Run time: " + (u2-u1));
+  //var u2 = performance.now();
 
+  //console.log(results);
+  console.log("Total Run time: " + pTot);
+  console.log("Total operations: " + totCalc);
+  var mspc = pTot/totCalc;
+
+  console.log("MSPC: " + mspc);
+  return mspc.toFixed(5);
+})();
+
+function ___Estimator(dFace, rolls) {
+  var bF = Big(dFace);
+  var bR = Big(rolls);
+
+  // (0.5d^2 - 0.5d)x^2 - (0.5d^2 - 1.5d)x - d
+  var ans = bF.pow(2).times(0.5).minus(bF.times(0.5)).times(bR.pow(2)).minus(
+    bF.pow(2).times(0.5).minus(bF.times(1.5)).times(bR)
+  ).minus(bF);
+
+  return ans;
 }
 
 // roll each of the dice a number of times
@@ -301,11 +307,11 @@ function clearStats() {
 
 }
 
-function calculateDice(e) {
+function calculateDiceRaw(bench) {
   //console.log("started");
   //debugger;
 
-  ___stats = {};
+  ;
   var allDices = $("#dices").find("[id]").map(function () {
     return $(this).data("dice_id");
   }).get();
@@ -318,11 +324,19 @@ function calculateDice(e) {
     diceCount.push([allDices[i], dVal]);
   }
 
+  var totOps = 0;
+
+  //for (i = 0; i < diceCount.length; i++) {}
+
+
   for (i = 0; i < diceCount.length; i++) {
+    totOps += ___Estimator(___dice.dice[diceCount[i][0]].numFaces, diceCount[i][1]);
     for (var j = 0; j < diceCount[i][1]; j++) {
       workArr.push(___dice.dice[diceCount[i][0]].faces.slice());
     }
   }
+
+
 
   //var rollResult = rollDice(diceCount);
 
@@ -351,6 +365,7 @@ function calculateDice(e) {
   }
 
   //debugger;
+  var __stepsOriginal = JSON.parse(JSON.stringify(steps));
   var stepx;
   var stepxArr;
   var stepxIdx;
@@ -358,44 +373,71 @@ function calculateDice(e) {
   var sIdxi;
   var tmpStpVal;
 
-  var __t1 = performance.now();
-  var __pCounter = 0;
-  var __aCounter = 0;
-  for (i = 0; i < workArr.length; i++ ) {
-    stepx = {};
-    stepxArr = workArr[i];
-    stepxIdx = [];
+  var __t1, __t2, __pCounter, __aCounter;
+  var benchTime, benchIdx;
 
-    prevStep = steps[i];
+  if (Number.isInteger(bench)) {
+    benchIdx = bench;
+  } else {
+    benchIdx = 1;
+  }
+  benchTime = 0;
+  for (var bi = 0; bi < benchIdx; bi++) {
+    __t1 = performance.now();
+    __pCounter = 0;
+    __aCounter = 0;
+    for (i = 0; i < workArr.length; i++ ) {
+      stepx = {};
+      stepxArr = workArr[i];
+      stepxIdx = [];
 
-    for (si = 0; si < stepxArr.length; si++) {
-      for (sIdxi = 0; sIdxi < prevStep.idx.length; sIdxi++) {
-        tmpStpVal = stepxArr[si] + prevStep.idx[sIdxi];
-        if (tmpStpVal in stepx) {
-          stepx[tmpStpVal] = stepx[tmpStpVal].plus(prevStep.val[prevStep.idx[sIdxi]]);
-          __pCounter++;
-        } else {
-          stepx[tmpStpVal] = new Big(prevStep.val[prevStep.idx[sIdxi]]);
-          __aCounter++;
-          stepxIdx.push(tmpStpVal);
+      prevStep = steps[i];
+
+      for (si = 0; si < stepxArr.length; si++) {
+        for (sIdxi = 0; sIdxi < prevStep.idx.length; sIdxi++) {
+          tmpStpVal = stepxArr[si] + prevStep.idx[sIdxi];
+          if (tmpStpVal in stepx) {
+            stepx[tmpStpVal] = stepx[tmpStpVal].plus(prevStep.val[prevStep.idx[sIdxi]]);
+            __pCounter++;
+          } else {
+            stepx[tmpStpVal] = new Big(prevStep.val[prevStep.idx[sIdxi]]);
+            __aCounter++;
+            stepxIdx.push(tmpStpVal);
+          }
         }
       }
-    }
 
-    steps[i+1] = {"idx": stepxIdx, "val": stepx}
+      steps[i+1] = {"idx": stepxIdx, "val": stepx}
 
-    if (i == workArr.length-1) {
-      finalStep = stepx;  // Array of Big() numbers
-      finalIdx = stepxIdx;
+      if (i == workArr.length-1) {
+        finalStep = stepx;  // Array of Big() numbers
+        finalIdx = stepxIdx;
+      }
     }
+    __t2 = performance.now();
+    //if (bench) {
+    benchTime += __t2-__t1;
+    steps = JSON.parse(JSON.stringify(__stepsOriginal));
+    //}
+
   }
 
-  var __t2 = performance.now();
+  var avgTime = (benchTime/benchIdx);
 
-  console.log("DURATION: " + (__t2-__t1));
+  console.log("Avg DURATION: " + (avgTime));
   console.log("PCounter: " + __pCounter);
   console.log("ACounter: " + __aCounter);
 
+  if (!bench) {
+    return {"finalIdx": finalIdx, "finalStep": finalStep};
+  } else {
+    return avgTime;
+  }
+}
+
+function calculateStats(finalIdx, finalStep) {
+
+  ___stats = {}
   var range, mean, median, mode;
   var stdev;
 
@@ -408,11 +450,11 @@ function calculateDice(e) {
   }
 
   // console.log(finalStep);
-  console.log("range = " + range);
-  console.log("mean = " + mean);
-  console.log("median = " + median);
-  console.log("mode = " + mode);
-  console.log("std dev = " + stdev);
+  //console.log("range = " + range);
+  //console.log("mean = " + mean);
+  //console.log("median = " + median);
+  //console.log("mode = " + mode);
+  //console.log("std dev = " + stdev);
 
   if (range && range.length > 1) {
     $("#rangeData").text(range[0] + " - " + range[1]);
@@ -470,6 +512,13 @@ function calculateDice(e) {
   //$("#stdevData").text(stdev ? stdev : "No Standard Deviation");
   //$('#statTable').DataTable();
   //debugger;
+}
+
+function calculateDice(e) {
+  var diceStatsRaw = calculateDiceRaw();
+
+  calculateStats(diceStatsRaw.finalIdx, diceStatsRaw.finalStep);
+
 }
 
 // Long way to calculate Mean
@@ -1109,7 +1158,7 @@ function init() {
     $("#statsToggleBtn").text("Show Stats");
   }
 
-  ___Benchmark();
+  //___Benchmark();
 
 }
 
