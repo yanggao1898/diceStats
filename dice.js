@@ -141,8 +141,6 @@ function rollDice() {
   //console.log("roll resuls")
   //console.log(dReturn);
   displayRolls(dReturn);
-
-  $(window).scrollTop($("#rollsDiv").offset().top);
 }
 
 function displayRolls(diceResult) {
@@ -288,7 +286,6 @@ function resetDice() {
   });
   clearRolls();
   clearStats();
-  $(window).scrollTop($("#tabs").position().top);
 }
 
 function clearRolls() {
@@ -615,12 +612,7 @@ function cstdev(idx, set, avg) {
   var count = new Big(0);
   idx.forEach(function (el) {
     count = count.plus(set[el]);
-    try {
-      stdAvgSum = stdAvgSum.plus(Big(el - avg).pow(2).times(set[el]));
-    } catch(err) {
-      debugger;
-    }
-
+    stdAvgSum = stdAvgSum.plus(Big(el - avg).pow(2).times(set[el]));
   });
   var v = new Big(0);
   if (count.gt(1)) {
