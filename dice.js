@@ -136,6 +136,35 @@ function ___Estimator(dFace, rolls) {
   return ans;
 }
 
+function ___Estimator2(dices) {
+  if (dices.length == 0) {
+    return 0;
+  }
+  var ops = Big(0);
+  var subOps = Big(0);
+
+
+  var answers = Big(dices[0][0]);
+  //var firstDice =
+  dices[0][1] = dices[0][1]-1;
+  if (dices[0][1] == 0) {
+    dices = dices.splice(1);
+  }
+
+  //var tmpAns;
+  for (var i = 0; i < dices.length; i++) {
+    for (var j = 0; j < dices[i][1]; j++) {
+      subOps = answers.times(dices[i][0]);
+      answers = answer.plus(dices[i][0] - 1);
+      //answers = tmpAns;
+      ops = ops.plus(subOps);
+    }
+  }
+  //debugger;
+  console.log("E2 Estimator: " + ops + " ops");
+  return ops;
+}
+
 // roll each of the dice a number of times
 function rollDice() {
   // get all the visible dice's IDs from the DOM
@@ -355,15 +384,18 @@ function estimateTime() {
   //var diceCount = [];
   //var workArr = [];
 
+  var dices = [];
   for (var i = 0; i < allDices.length; i++) {
     var dVal = parseInt($("#"+allDices[i]+"_count").val()) || 0;
     dVal = dVal < 0 ? 0 : dVal;
 
     if (dVal > 0) {
-      totOps = totOps.plus(___Estimator(___dice.dice[allDices[i]].numFaces, dVal));
+      dices.push([___dice.dice[allDices[i]].numFaces, dVal])
+      //totOps = totOps.plus(___Estimator());
     }
     //diceCount.push([allDices[i], dVal]);
   }
+  totOps = ___Estimator2(dices);
 
   console.log("Estimated Ops: " + totOps);
 
