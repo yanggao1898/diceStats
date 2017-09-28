@@ -155,7 +155,7 @@ function ___Estimator2(dices) {
   for (var i = 0; i < dices.length; i++) {
     for (var j = 0; j < dices[i][1]; j++) {
       subOps = answers.times(dices[i][0]);
-      answers = answer.plus(dices[i][0] - 1);
+      answers = answers.plus(dices[i][0] - 1);
       //answers = tmpAns;
       ops = ops.plus(subOps);
     }
@@ -621,18 +621,68 @@ function calculateStats(finalIdx, finalStep) {
 function calculateDice(e) {
   var estTime = estimateTime();
 
-  /*
-  if (estTime > 1000) {
-    console.log("Estimated time required: " + estTime);
+  $("#warningStatsDiv").empty();
+  if (estTime >= 250 && estTime < 1000) {
+    //console.log("Estimated time required: " + estTime);
+    // Show "Show stats" to calculate
+    $("#statWarnTarget").hide();
+    $("#warningStatsDiv").append(
+      $("<div>").addClass("alert alert-primary stat-warn stat-warn-ok").attr("id", "statWarnOk").text(
+        "Show stats"
+      )
+    );
+    return;
+  } else if (estTime >= 1000 && estTime < 10000) {
+    // Show "Show stats (This may take a few seconds...)"
+    $("#statWarnTarget").hide();
+    $("#warningStatsDiv").append(
+      $("<div>").addClass("alert alert-info stat-warn stat-warn-ok").attr("id", "statWarnFast").text(
+        "Show stats (This may take a few seconds)"
+      )
+    );
+    return;
+  } else if (estTime >= 10000 && estTime < 20000) {
+    // Show "Show stats (This may take over 10 seconds...)"
+    $("#statWarnTarget").hide();
+    $("#warningStatsDiv").append(
+      $("<div>").addClass("alert alert-warning stat-warn stat-warn-bad").attr("id", "statWarnMedium").text(
+        "Show stats (This may take over 10 seconds!)"
+      )
+    );
+    return;
+  } else if (estTime >= 20000 ) {
+    // "Show stats (THIS WILL TAKE A LONG TIME. ESTIMATED: # SECONDS/MINUTES/HOURS...)"
+    var longEstTime = parseInt(estTime/1000);
+    var longUnit = " seconds";
+    if (longEstTime > 120) {
+      longEstTime = parseInt(longEstTime/60);
+      longUnit = " minutes";
+
+      if (longEstTime > 60) {
+        longEstTime = longEstTime/60;
+        longUnit = " hours";
+      }
+    }
+    $("#statWarnTarget").hide();
+    $("#warningStatsDiv").append(
+      $("<div>").addClass("alert alert-danger stat-warn stat-warn-bad").attr("id", "statWarnSlow").text(
+        "Show stats (THIS WILL TAKE A LONG TIME!) \n Estimated to take: " + longEstTime + longUnit
+      )
+    );
     return;
   }
-  */
+
 
   console.log("Estimated time required: " + estTime);
+
+  actuallyCalculateDice();
+
+}
+
+function actuallyCalculateDice() {
   var diceStatsRaw = calculateDiceRaw();
 
   calculateStats(diceStatsRaw.finalIdx, diceStatsRaw.finalStep);
-
 }
 
 // Long way to calculate Mean
