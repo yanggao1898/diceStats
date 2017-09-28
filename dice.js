@@ -397,7 +397,7 @@ function estimateTime() {
   }
   totOps = ___Estimator2(dices);
 
-  console.log("Estimated Ops: " + totOps);
+  //console.log("Estimated Ops: " + totOps);
 
   var time = Number.parseFloat(totOps.toString()) * ___profiler.getAvg();
 
@@ -521,8 +521,8 @@ function calculateDiceRaw(bench) {
 
   var avgTime = (benchTime/benchIdx);
 
-  console.log("Avg DURATION: " + (avgTime));
-  console.log("benchTime: " + benchTime);
+  //console.log("Avg DURATION: " + (avgTime));
+  //console.log("benchTime: " + benchTime);
   //console.log("PCounter: " + __pCounter);
   //console.log("ACounter: " + __aCounter);
   console.log("Total Ops: " + (__pCounter + __aCounter));
@@ -673,6 +673,7 @@ function calculateDice(e) {
   }
 
 
+<<<<<<< HEAD
   console.log("Estimated time required: " + estTime);
 
   actuallyCalculateDice();
@@ -680,6 +681,9 @@ function calculateDice(e) {
 }
 
 function actuallyCalculateDice() {
+=======
+  //console.log("Estimated time required: " + estTime);
+>>>>>>> 8916dc190d2d70804b7d3c0ba180ecf37587e2f2
   var diceStatsRaw = calculateDiceRaw();
 
   calculateStats(diceStatsRaw.finalIdx, diceStatsRaw.finalStep);
