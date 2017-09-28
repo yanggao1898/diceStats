@@ -645,7 +645,13 @@ function calculateDice(e) {
     // Show "Show stats (This may take over 10 seconds...)"
     $("#statWarnTarget").hide();
     $("#warningStatsDiv").append(
-      $("<div>").addClass("alert alert-warning stat-warn stat-warn-bad").attr("id", "statWarnMedium").text(
+      $("<div>").addClass("alert alert-warning stat-warn stat-warn-bad").attr(
+        {
+          "id": "statWarnMedium",
+          "data-toggle": "modal",
+          "data-target": "#statWarnConfirmAlert"
+        }
+      ).text(
         "Show stats (This may take over 10 seconds!)"
       )
     );
@@ -665,25 +671,34 @@ function calculateDice(e) {
     }
     $("#statWarnTarget").hide();
     $("#warningStatsDiv").append(
-      $("<div>").addClass("alert alert-danger stat-warn stat-warn-bad").attr("id", "statWarnSlow").text(
+      $("<div>").addClass("alert alert-danger stat-warn stat-warn-bad").attr(
+        {
+          "id": "statWarnSlow",
+          "data-toggle": "modal",
+          "data-target": "#statWarnConfirmAlert"
+        }
+      ).text(
         "Show stats (THIS WILL TAKE A LONG TIME!) \n Estimated to take: " + longEstTime + longUnit
       )
     );
     return;
   }
 
-
-<<<<<<< HEAD
-  console.log("Estimated time required: " + estTime);
-
   actuallyCalculateDice();
+  //console.log("Estimated time required: " + estTime);
+
+}
+
+function statWarnClearAndCalc() {
+  $("#warningStatsDiv").empty();
+  actuallyCalculateDice();
+}
+
+function statWarnConfirm() {
 
 }
 
 function actuallyCalculateDice() {
-=======
-  //console.log("Estimated time required: " + estTime);
->>>>>>> 8916dc190d2d70804b7d3c0ba180ecf37587e2f2
   var diceStatsRaw = calculateDiceRaw();
 
   calculateStats(diceStatsRaw.finalIdx, diceStatsRaw.finalStep);
@@ -1305,6 +1320,9 @@ function init() {
   $("#diceEditModal").on("change", ".modal-table-val-entry", modalValSymChange);
   $("#diceEditModal").on("change", ".modal-table-sym-entry", modalValSymChange);
   $("#diceEditModal").on("change", ".pick_color", updateColors);
+
+  $("#warningStatsDiv").on("click", ".stat-warn-ok", statWarnClearAndCalc);
+  //$("#warningStatsDiv").on("click", ".stat-warn-bad", )
   $("#clearRollBtn").click(clearRolls);
 
   //$("#diceCountScroll").on("scroll", _.throttle(hideTabOnScroll, 50));
