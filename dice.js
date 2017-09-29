@@ -711,6 +711,7 @@ function statWarnClearAndCalc() {
 }
 
 function statWarnConfirm() {
+  $("statWarnModalYesBtn").prop("disabled", true);
   statWarnClearAndCalc();
 }
 
@@ -1338,7 +1339,7 @@ function init() {
   $("#diceEditModal").on("change", ".pick_color", updateColors);
 
   $("#warningStatsDiv").on("click", ".stat-warn-ok", statWarnClearAndCalc);
-  $("#statWarnModalBody").on("click", "#statWarnModalYesBtn", statWarnClearAndCalc);
+  $("#statWarnModalBody").on("click", "#statWarnModalYesBtn", statWarnConfirm);
   $("#clearRollBtn").click(clearRolls);
 
   //$("#diceCountScroll").on("scroll", _.throttle(hideTabOnScroll, 50));

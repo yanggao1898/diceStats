@@ -1,5 +1,5 @@
 Make the dice roller UI better (diceRollUI branch).
-  - After each roll, the roll results will be focused (especially important on Mobile views).
+  x- After each roll, the roll results will be focused (especially important on Mobile views).
   - Dice counter area needs to scroll, leaving the Roll Dice button visible always.
 
   Behavior:
@@ -8,9 +8,12 @@ Make the dice roller UI better (diceRollUI branch).
         -> Show results
           -> When the dice list is too long, will need to re-scale dice results area. "Total" must be visible. "Roll Dice" must be visible to allow quick re-rolling.
 
-          -> When "Clear Rolls" or "Reset Dice" buttons are pressed, reset the size of the results area if necessary.
+          x-> When "Clear Rolls" or "Reset Dice" buttons are pressed, reset the size of the results area if necessary.
 
 Colorize the Total number based on distance (in stdev) from expected Mean.
 
 Estimate speed of stdev calculations. Do not auto-calculate if expected time is too long.
-  - Give option to manually start the calculations. Give estimate of time.
+  x- Give option to manually start the calculations. Give estimate of time.
+  - if the manual option is clicked, show the stats table with a progress indication over the table during the calculations
+    - progress indicator can be a spinner at first
+      - Maybe a progress bar later?
