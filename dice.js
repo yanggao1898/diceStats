@@ -620,6 +620,7 @@ function calculateStats(finalIdx, finalStep) {
 
 function calculateDice(e) {
   var estTime = estimateTime();
+  $("#statWarnTarget").show();
 
   $("#warningStatsDiv").empty();
   if (estTime >= 250 && estTime < 1000) {
@@ -690,12 +691,13 @@ function calculateDice(e) {
 }
 
 function statWarnClearAndCalc() {
+  $("#statWarnTarget").show();
   $("#warningStatsDiv").empty();
   actuallyCalculateDice();
 }
 
 function statWarnConfirm() {
-
+  statWarnClearAndCalc();
 }
 
 function actuallyCalculateDice() {
@@ -1322,7 +1324,7 @@ function init() {
   $("#diceEditModal").on("change", ".pick_color", updateColors);
 
   $("#warningStatsDiv").on("click", ".stat-warn-ok", statWarnClearAndCalc);
-  //$("#warningStatsDiv").on("click", ".stat-warn-bad", )
+  $("#statWarnModalBody").on("click", "#statWarnModalYesBtn", statWarnClearAndCalc);
   $("#clearRollBtn").click(clearRolls);
 
   //$("#diceCountScroll").on("scroll", _.throttle(hideTabOnScroll, 50));

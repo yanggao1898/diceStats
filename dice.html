@@ -203,10 +203,18 @@
       <div class="modal-dialog" roll="document">
         <div class="modal-content">
           <div class="modal-header" id="statWarnModalHeader">
-
+            Are you sure?
           </div>
           <div class="modal-body" id="statWarnModalBody">
-
+            <div class="alert alert-warning">
+              Are you sure you want to calculate this? This can take very, very long, and may freeze up your browser.
+              <button type="button" class="btn btn-warning" id="statWarnModalYesBtn">
+                Calculate Anyways
+              </button>
+              <button type="button" data-dismiss="modal" class="btn btn-secondary" id="statWarnModalNoBtn">
+                Cancel
+              </button>
+            </div>
           </div>
         </div>
       </div>
