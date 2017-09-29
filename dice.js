@@ -622,6 +622,7 @@ function calculateDice(e) {
   var estTime = estimateTime();
   $("#statWarnTarget").show();
 
+
   $("#warningStatsDiv").empty();
   if (estTime >= 250 && estTime < 1000) {
     //console.log("Estimated time required: " + estTime);
@@ -633,57 +634,70 @@ function calculateDice(e) {
       )
     );
     return;
-  } else if (estTime >= 1000 && estTime < 10000) {
-    // Show "Show stats (This may take a few seconds...)"
-    $("#statWarnTarget").hide();
-    $("#warningStatsDiv").append(
-      $("<div>").addClass("alert alert-info stat-warn stat-warn-ok").attr("id", "statWarnFast").text(
-        "Show stats (This may take a few seconds)"
-      )
-    );
-    return;
-  } else if (estTime >= 10000 && estTime < 20000) {
-    // Show "Show stats (This may take over 10 seconds...)"
-    $("#statWarnTarget").hide();
-    $("#warningStatsDiv").append(
-      $("<div>").addClass("alert alert-warning stat-warn stat-warn-bad").attr(
-        {
-          "id": "statWarnMedium",
-          "data-toggle": "modal",
-          "data-target": "#statWarnConfirmAlert"
-        }
-      ).text(
-        "Show stats (This may take over 10 seconds!)"
-      )
-    );
-    return;
-  } else if (estTime >= 20000 ) {
-    // "Show stats (THIS WILL TAKE A LONG TIME. ESTIMATED: # SECONDS/MINUTES/HOURS...)"
-    var longEstTime = parseInt(estTime/1000);
-    var longUnit = " seconds";
-    if (longEstTime > 120) {
-      longEstTime = parseInt(longEstTime/60);
-      longUnit = " minutes";
+  } else if (estTime >= 1000) {
+    var eTLo = Math.round(estTime / 2 / 1000);
+    var eTHi = Math.round(estTime * 2 / 1000);
 
-      if (longEstTime > 60) {
-        longEstTime = longEstTime/60;
-        longUnit = " hours";
-      }
-    }
-    $("#statWarnTarget").hide();
-    $("#warningStatsDiv").append(
-      $("<div>").addClass("alert alert-danger stat-warn stat-warn-bad").attr(
-        {
-          "id": "statWarnSlow",
-          "data-toggle": "modal",
-          "data-target": "#statWarnConfirmAlert"
+    //var
+
+    if(estTime >= 1000 && estTime < 10000) {
+      // Show "Show stats (This may take a few seconds...)"
+      $("#statWarnTarget").hide();
+      $("#warningStatsDiv").append(
+        $("<div>").addClass("alert alert-info stat-warn stat-warn-ok").attr("id", "statWarnFast").text(
+          "Show stats (This may take " + eTLo + " to " + eTHi + " seconds)"
+        )
+      );
+      return;
+    } else if (estTime >= 10000 && estTime < 20000) {
+      // Show "Show stats (This may take over 10 seconds...)"
+      $("#statWarnTarget").hide();
+      $("#warningStatsDiv").append(
+        $("<div>").addClass("alert alert-warning stat-warn stat-warn-bad").attr(
+          {
+            "id": "statWarnMedium",
+            "data-toggle": "modal",
+            "data-target": "#statWarnConfirmAlert"
+          }
+        ).text(
+          "Show stats (This may take " + eTLo + " to " + eTHi + " seconds!)"
+        )
+      );
+      return;
+    } else if (estTime >= 20000 ) {
+      // "Show stats (THIS WILL TAKE A LONG TIME. ESTIMATED: # SECONDS/MINUTES/HOURS...)"
+      var longEstTime = Math.round(estTime/1000);
+      var longUnit = " seconds";
+      if (longEstTime > 120) {
+        longEstTime = Math.round(longEstTime/60);
+        longUnit = " minutes";
+
+        if (longEstTime > 60) {
+          longEstTime = (longEstTime/60).toFixed(1);
+          longUnit = " hours";
         }
-      ).text(
-        "Show stats (THIS WILL TAKE A LONG TIME!) \n Estimated to take: " + longEstTime + longUnit
-      )
-    );
-    return;
+      }
+      eTLo = Math.round(longEstTime / 2);
+      eTHi = Math.round(longEstTime * 2);
+
+      $("#statWarnTarget").hide();
+      $("#warningStatsDiv").append(
+        $("<div>").addClass("alert alert-danger stat-warn stat-warn-bad").attr(
+          {
+            "id": "statWarnSlow",
+            "data-toggle": "modal",
+            "data-target": "#statWarnConfirmAlert"
+          }
+        ).html(
+          "Show stats (THIS WILL TAKE A LONG TIME!) <br>" +
+          "Estimated to take: " + eTLo + " to " + eTHi + longUnit
+        )
+      );
+      return;
+    }
   }
+
+
 
   actuallyCalculateDice();
   //console.log("Estimated time required: " + estTime);
