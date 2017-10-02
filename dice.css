@@ -131,6 +131,14 @@ body {
 
 }
 
+.greyout {
+  opacity: 0.3;
+}
+
+.-tbl-lbl {
+  width: 12rem;
+}
+
 .dice_count_label {
   max-width: 10rem;
   flex: 1;

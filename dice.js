@@ -1,5 +1,32 @@
 var ___dice = {"dice" : {}, "settings" : {}, "meta" : {}};
 var ___stats = {};
+var ___profiler = (function() {
+  var avg = 0.01;
+  var perf = [];
+
+  function calcAvg() {
+    var ta = 0;
+    perf.forEach(function(el) {
+      ta += el;
+      avg = ta/perf.length;
+    });
+
+  }
+
+  return {
+    add: (sample) => {
+      if (perf.length < 5) {
+        perf.push(sample);
+      } else {
+        perf.shift();
+        perf.push(sample);
+      }
+      calcAvg();
+    },
+    getAvg: () => avg,
+    getPerf: () => perf
+  }
+})();
 //var ___dicePageSettings = {}
 
 String.prototype.hashCode = function() {
@@ -79,13 +106,23 @@ var ___bench = (function() {
   //console.log(results);
   console.log("Total Run time: " + pTot);
   console.log("Total operations: " + totCalc);
-  var mspc = pTot/totCalc;
+
+  var mspc = pTot*2/totCalc;
+  // the *2 is because the benchmark tests
+  // are roughly twice as fast as actual calculation speeds, so
+  // the *2 will compensate for that
 
   console.log("MSPC: " + mspc);
-  return mspc.toFixed(5);
+  ___profiler.add(Number.parseFloat(mspc.toFixed(5)));
+  return Number.parseFloat(mspc.toFixed(5));
 })();
 
 function ___Estimator(dFace, rolls) {
+  if (rolls <= 0) {
+    console.log("Rolls: " + rolls);
+    debugger;
+    return Big(0);
+  }
   var bF = Big(dFace);
   var bR = Big(rolls);
 
@@ -94,7 +131,38 @@ function ___Estimator(dFace, rolls) {
     bF.pow(2).times(0.5).minus(bF.times(1.5)).times(bR)
   ).minus(bF);
 
+  console.log("For " + rolls + " d" + dFace + ": " + ans.toString() + " ops");
+
   return ans;
+}
+
+function ___Estimator2(dices) {
+  if (dices.length == 0) {
+    return 0;
+  }
+  var ops = Big(0);
+  var subOps = Big(0);
+
+
+  var answers = Big(dices[0][0]);
+  //var firstDice =
+  dices[0][1] = dices[0][1]-1;
+  if (dices[0][1] == 0) {
+    dices = dices.splice(1);
+  }
+
+  //var tmpAns;
+  for (var i = 0; i < dices.length; i++) {
+    for (var j = 0; j < dices[i][1]; j++) {
+      subOps = answers.times(dices[i][0]);
+      answers = answers.plus(dices[i][0] - 1);
+      //answers = tmpAns;
+      ops = ops.plus(subOps);
+    }
+  }
+  //debugger;
+  console.log("E2 Estimator: " + ops + " ops");
+  return ops;
 }
 
 // roll each of the dice a number of times
@@ -308,11 +376,40 @@ function clearStats() {
 
 }
 
+function estimateTime() {
+  var allDices = $("#dices").find("[id]").map(function () {
+    return $(this).data("dice_id");
+  }).get();
+  var totOps = Big(0);
+
+  //var diceCount = [];
+  //var workArr = [];
+
+  var dices = [];
+  for (var i = 0; i < allDices.length; i++) {
+    var dVal = parseInt($("#"+allDices[i]+"_count").val()) || 0;
+    dVal = dVal < 0 ? 0 : dVal;
+
+    if (dVal > 0) {
+      dices.push([___dice.dice[allDices[i]].numFaces, dVal])
+      //totOps = totOps.plus(___Estimator());
+    }
+    //diceCount.push([allDices[i], dVal]);
+  }
+  totOps = ___Estimator2(dices);
+
+  //console.log("Estimated Ops: " + totOps);
+
+  var time = Number.parseFloat(totOps.toString()) * ___profiler.getAvg();
+
+  return time;
+}
+
 function calculateDiceRaw(bench) {
   //console.log("started");
   //debugger;
 
-  ;
+  //;
   var allDices = $("#dices").find("[id]").map(function () {
     return $(this).data("dice_id");
   }).get();
@@ -325,13 +422,13 @@ function calculateDiceRaw(bench) {
     diceCount.push([allDices[i], dVal]);
   }
 
-  var totOps = 0;
+  //var totOps = 0;
 
   //for (i = 0; i < diceCount.length; i++) {}
 
 
   for (i = 0; i < diceCount.length; i++) {
-    totOps += ___Estimator(___dice.dice[diceCount[i][0]].numFaces, diceCount[i][1]);
+    //totOps += ___Estimator(___dice.dice[diceCount[i][0]].numFaces, diceCount[i][1]);
     for (var j = 0; j < diceCount[i][1]; j++) {
       workArr.push(___dice.dice[diceCount[i][0]].faces.slice());
     }
@@ -425,9 +522,16 @@ function calculateDiceRaw(bench) {
 
   var avgTime = (benchTime/benchIdx);
 
-  console.log("Avg DURATION: " + (avgTime));
-  console.log("PCounter: " + __pCounter);
-  console.log("ACounter: " + __aCounter);
+  //console.log("Avg DURATION: " + (avgTime));
+  //console.log("benchTime: " + benchTime);
+  //console.log("PCounter: " + __pCounter);
+  //console.log("ACounter: " + __aCounter);
+  console.log("Total Ops: " + (__pCounter + __aCounter));
+
+  if(benchTime > 25) {
+    var mspc = benchTime / (__pCounter+__aCounter);
+    ___profiler.add(Number.parseFloat(mspc.toFixed(5)));
+  }
 
   if (!bench) {
     return {"finalIdx": finalIdx, "finalStep": finalStep};
@@ -516,10 +620,106 @@ function calculateStats(finalIdx, finalStep) {
 }
 
 function calculateDice(e) {
+  var estTime = estimateTime();
+  $("#statWarnTarget").show();
+
+
+  $("#warningStatsDiv").empty();
+  if (estTime >= 250 && estTime < 1000) {
+    //console.log("Estimated time required: " + estTime);
+    // Show "Show stats" to calculate
+    $("#statWarnTarget").hide();
+    $("#warningStatsDiv").append(
+      $("<div>").addClass("alert alert-primary stat-warn stat-warn-ok").attr("id", "statWarnOk").text(
+        "Show stats"
+      )
+    );
+    return;
+  } else if (estTime >= 1000) {
+    var eTLo = Math.round(estTime / 2 / 1000);
+    var eTHi = Math.round(estTime * 2 / 1000);
+
+    //var
+
+    if(estTime >= 1000 && estTime < 10000) {
+      // Show "Show stats (This may take a few seconds...)"
+      $("#statWarnTarget").hide();
+      $("#warningStatsDiv").append(
+        $("<div>").addClass("alert alert-info stat-warn stat-warn-ok").attr("id", "statWarnFast").text(
+          "Show stats (This may take " + eTLo + " to " + eTHi + " seconds)"
+        )
+      );
+      return;
+    } else if (estTime >= 10000 && estTime < 20000) {
+      // Show "Show stats (This may take over 10 seconds...)"
+      $("#statWarnTarget").hide();
+      $("#warningStatsDiv").append(
+        $("<div>").addClass("alert alert-warning stat-warn stat-warn-bad").attr(
+          {
+            "id": "statWarnMedium",
+            "data-toggle": "modal",
+            "data-target": "#statWarnConfirmAlert"
+          }
+        ).text(
+          "Show stats (This may take " + eTLo + " to " + eTHi + " seconds!)"
+        )
+      );
+      return;
+    } else if (estTime >= 20000 ) {
+      // "Show stats (THIS WILL TAKE A LONG TIME. ESTIMATED: # SECONDS/MINUTES/HOURS...)"
+      var longEstTime = Math.round(estTime/1000);
+      var longUnit = " seconds";
+      if (longEstTime > 120) {
+        longEstTime = Math.round(longEstTime/60);
+        longUnit = " minutes";
+
+        if (longEstTime > 60) {
+          longEstTime = (longEstTime/60).toFixed(1);
+          longUnit = " hours";
+        }
+      }
+      eTLo = Math.round(longEstTime / 2);
+      eTHi = Math.round(longEstTime * 2);
+
+      $("#statWarnTarget").hide();
+      $("#warningStatsDiv").append(
+        $("<div>").addClass("alert alert-danger stat-warn stat-warn-bad").attr(
+          {
+            "id": "statWarnSlow",
+            "data-toggle": "modal",
+            "data-target": "#statWarnConfirmAlert"
+          }
+        ).html(
+          "Show stats (THIS WILL TAKE A LONG TIME!) <br>" +
+          "Estimated to take: " + eTLo + " to " + eTHi + longUnit
+        )
+      );
+      return;
+    }
+  }
+
+
+
+  actuallyCalculateDice();
+  //console.log("Estimated time required: " + estTime);
+
+}
+
+function statWarnClearAndCalc() {
+  $("#statWarnTarget").show();
+  $("#warningStatsDiv").empty();
+  actuallyCalculateDice();
+}
+
+function statWarnConfirm() {
+  $("statWarnModalYesBtn").prop("disabled", true);
+  statWarnClearAndCalc();
+}
+
+function actuallyCalculateDice() {
   var diceStatsRaw = calculateDiceRaw();
 
   calculateStats(diceStatsRaw.finalIdx, diceStatsRaw.finalStep);
-
 }
 
 // Long way to calculate Mean
@@ -1133,6 +1333,9 @@ function init() {
   $("#diceEditModal").on("change", ".modal-table-val-entry", modalValSymChange);
   $("#diceEditModal").on("change", ".modal-table-sym-entry", modalValSymChange);
   $("#diceEditModal").on("change", ".pick_color", updateColors);
+
+  $("#warningStatsDiv").on("click", ".stat-warn-ok", statWarnClearAndCalc);
+  $("#statWarnModalBody").on("click", "#statWarnModalYesBtn", statWarnConfirm);
   $("#clearRollBtn").click(clearRolls);
 
   //$("#diceCountScroll").on("scroll", _.throttle(hideTabOnScroll, 50));
