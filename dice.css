@@ -131,6 +131,10 @@ body {
 
 }
 
+.greyout {
+  opacity: 0.3;
+}
+
 .-tbl-lbl {
   width: 12rem;
 }
