@@ -210,7 +210,7 @@ function rollDice() {
   //console.log(dReturn);
   displayRolls(dReturn);
 
-  $(document).scrollTop($("#rollDiceBtnGrp").position().top);
+  $(window).scrollTop($("#rollsDiv").offset().top);
 }
 
 function displayRolls(diceResult) {
@@ -356,13 +356,12 @@ function resetDice() {
   });
   clearRolls();
   clearStats();
-
+  $(window).scrollTop($("#tabs").position().top);
 }
 
 function clearRolls() {
   $("#diceRollResultDiv").empty();
   $("#clearRollBtn").hide();
-  $(document).scrollTop(0);
 }
 
 function clearStats() {
@@ -410,6 +409,10 @@ function calculateDiceRaw(bench) {
   //debugger;
 
   //;
+
+}
+
+function calculateDiceWrapper() {
   var allDices = $("#dices").find("[id]").map(function () {
     return $(this).data("dice_id");
   }).get();
@@ -463,16 +466,12 @@ function calculateDiceRaw(bench) {
   }
 
   //debugger;
-  var __stepsOriginal = JSON.parse(JSON.stringify(steps));
-  var stepx;
-  var stepxArr;
-  var stepxIdx;
-  var si;
-  var sIdxi;
-  var tmpStpVal;
 
-  var __t1, __t2, __pCounter, __aCounter;
-  var benchTime, benchIdx;
+  /*// Benchmarking code
+  var __stepsOriginal = JSON.parse(JSON.stringify(steps));
+
+
+
 
   if (Number.isInteger(bench)) {
     benchIdx = bench;
@@ -480,47 +479,28 @@ function calculateDiceRaw(bench) {
     benchIdx = 1;
   }
   benchTime = 0;
-  for (var bi = 0; bi < benchIdx; bi++) {
-    __t1 = performance.now();
-    __pCounter = 0;
-    __aCounter = 0;
-    for (i = 0; i < workArr.length; i++ ) {
-      stepx = {};
-      stepxArr = workArr[i];
-      stepxIdx = [];
+  //*/
+  //for (var bi = 0; bi < benchIdx; bi++) {
+  var __t1, __t2, __pCounter, __aCounter;
+  var benchTime;
+  __t1 = performance.now();
+  //__pCounter = 0;
+  //__aCounter = 0;
 
-      prevStep = steps[i];
+  var coreResults = calculateDiceCore(workArr, steps);
 
-      for (si = 0; si < stepxArr.length; si++) {
-        for (sIdxi = 0; sIdxi < prevStep.idx.length; sIdxi++) {
-          tmpStpVal = stepxArr[si] + prevStep.idx[sIdxi];
-          if (tmpStpVal in stepx) {
-            stepx[tmpStpVal] = stepx[tmpStpVal].plus(prevStep.val[prevStep.idx[sIdxi]]);
-            __pCounter++;
-          } else {
-            stepx[tmpStpVal] = new Big(prevStep.val[prevStep.idx[sIdxi]]);
-            __aCounter++;
-            stepxIdx.push(tmpStpVal);
-          }
-        }
-      }
-
-      steps[i+1] = {"idx": stepxIdx, "val": stepx}
-
-      if (i == workArr.length-1) {
-        finalStep = stepx;  // Array of Big() numbers
-        finalIdx = stepxIdx;
-      }
-    }
-    __t2 = performance.now();
-    //if (bench) {
-    benchTime += __t2-__t1;
-    steps = JSON.parse(JSON.stringify(__stepsOriginal));
+  __t2 = performance.now();
+  //if (bench) {
+  benchTime += __t2-__t1;
+  __pCounter = coreResults.pC;
+  __aCounter = coreResults.aC;
+  //steps = JSON.parse(JSON.stringify(__stepsOriginal));
     //}
 
-  }
-
+  //}
+  /*//
   var avgTime = (benchTime/benchIdx);
+  //*/
 
   //console.log("Avg DURATION: " + (avgTime));
   //console.log("benchTime: " + benchTime);
@@ -533,11 +513,54 @@ function calculateDiceRaw(bench) {
     ___profiler.add(Number.parseFloat(mspc.toFixed(5)));
   }
 
-  if (!bench) {
-    return {"finalIdx": finalIdx, "finalStep": finalStep};
-  } else {
-    return avgTime;
+  //if (!bench) {
+  return {"finalIdx": coreResults.finalIdx, "finalStep": coreResults.finalStep};
+  //} else {
+  //  return avgTime;
+  //}
+}
+
+function calculateDiceCore(workArr, steps) {
+  var stepx;
+  var stepxArr;
+  var stepxIdx;
+  var i, si;
+  var sIdxi;
+  var tmpStpVal;
+  var _aCount = 0;
+  var _pCount = 0;
+
+  var returnObj;
+  for (i = 0; i < workArr.length; i++ ) {
+    stepx = {};
+    stepxArr = workArr[i];
+    stepxIdx = [];
+
+    prevStep = steps[i];
+
+    for (si = 0; si < stepxArr.length; si++) {
+      for (sIdxi = 0; sIdxi < prevStep.idx.length; sIdxi++) {
+        tmpStpVal = stepxArr[si] + prevStep.idx[sIdxi];
+        if (tmpStpVal in stepx) {
+          stepx[tmpStpVal] = stepx[tmpStpVal].plus(prevStep.val[prevStep.idx[sIdxi]]);
+          _pCount++;
+        } else {
+          stepx[tmpStpVal] = new Big(prevStep.val[prevStep.idx[sIdxi]]);
+          _aCount++;
+          stepxIdx.push(tmpStpVal);
+        }
+      }
+    }
+
+    steps[i+1] = {"idx": stepxIdx, "val": stepx}
+
+    if (i == workArr.length-1) {
+      returnObj = { "finalStep": stepx, "finalIdx":stepxIdx, "pC": _pCount, "aC": _aCount};
+      //finalStep = stepx;  // Array of Big() numbers
+      //finalIdx = stepxIdx;
+    }
   }
+  return returnObj;
 }
 
 function calculateStats(finalIdx, finalStep) {
@@ -608,7 +631,7 @@ function calculateStats(finalIdx, finalStep) {
     return "No Mode";
   })() );
   //*/
-  if (parseFloat(stdev)) {
+  if (parseInt(stdev)) {
     $("#stdevData").text(stdev);
     ___stats.stdev = stdev;
   } else {
@@ -706,19 +729,64 @@ function calculateDice(e) {
 }
 
 function statWarnClearAndCalc() {
-  $("#statWarnTarget").show();
-  $("#warningStatsDiv").empty();
-  actuallyCalculateDice();
+  //$("#warningStatsDiv").empty();
+  //$("#statWarnTarget").addClass("greyout");
+
+  var prom = new Promise(function (res, rej) {
+    res();
+  });
+  $("#warningStatsDiv").empty(statWarnSpinner);
+  prom.then(actuallyCalculateDice).then(function() {
+    $("#warningStatsDiv").empty();
+    $("#statWarnTarget").show();
+  });
+  /*
+  var step1 = function() {
+    //debugger;
+    var p1 = new Promise(statWarnSpinner);
+    return p1;
+  }
+  var step2 = function() {
+    debugger;
+    var p2 = new Promise(actuallyCalculateDice);
+    return p2;
+  }
+
+  var step3 = function () {
+    var p3 = new Promise(function() {
+
+    });
+    return p3;
+  }
+
+  step1().then(step2).then(step3);
+  */
+
+  //setTimeout(actuallyCalculateDice(), 100);
 }
 
+function statWarnSpinner() {
+  $("#warningStatsDiv").empty();
+  $("#warningStatsDiv").append(
+    $("<div>").addClass("alert alert-dark").append(
+      $("<i>").addClass("fa fa-spinner fa-spin fa-lg fa-fw")
+    )
+  );
+}
+
+
+
 function statWarnConfirm() {
-  $("statWarnModalYesBtn").prop("disabled", true);
+  console.log("confirm");
+  //if ($(""))
+  //$("#statWarnModalYesBtn").prop("disabled", true);
   statWarnClearAndCalc();
 }
 
 function actuallyCalculateDice() {
-  var diceStatsRaw = calculateDiceRaw();
-
+  console.log("starting dice raw");
+  var diceStatsRaw = calculateDiceWrapper();
+  console.log("finished dice raw");
   calculateStats(diceStatsRaw.finalIdx, diceStatsRaw.finalStep);
 }
 
@@ -816,7 +884,12 @@ function cstdev(idx, set, avg) {
   var count = new Big(0);
   idx.forEach(function (el) {
     count = count.plus(set[el]);
-    stdAvgSum = stdAvgSum.plus(Big(el - avg).pow(2).times(set[el]));
+    try {
+      stdAvgSum = stdAvgSum.plus(Big(el - avg).pow(2).times(set[el]));
+    } catch(err) {
+      debugger;
+    }
+
   });
   var v = new Big(0);
   if (count.gt(1)) {
