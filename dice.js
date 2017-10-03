@@ -520,48 +520,6 @@ function calculateDiceWrapper() {
   //}
 }
 
-function calculateDiceCore(workArr, steps) {
-  var stepx;
-  var stepxArr;
-  var stepxIdx;
-  var i, si;
-  var sIdxi;
-  var tmpStpVal;
-  var _aCount = 0;
-  var _pCount = 0;
-
-  var returnObj;
-  for (i = 0; i < workArr.length; i++ ) {
-    stepx = {};
-    stepxArr = workArr[i];
-    stepxIdx = [];
-
-    prevStep = steps[i];
-
-    for (si = 0; si < stepxArr.length; si++) {
-      for (sIdxi = 0; sIdxi < prevStep.idx.length; sIdxi++) {
-        tmpStpVal = stepxArr[si] + prevStep.idx[sIdxi];
-        if (tmpStpVal in stepx) {
-          stepx[tmpStpVal] = stepx[tmpStpVal].plus(prevStep.val[prevStep.idx[sIdxi]]);
-          _pCount++;
-        } else {
-          stepx[tmpStpVal] = new Big(prevStep.val[prevStep.idx[sIdxi]]);
-          _aCount++;
-          stepxIdx.push(tmpStpVal);
-        }
-      }
-    }
-
-    steps[i+1] = {"idx": stepxIdx, "val": stepx}
-
-    if (i == workArr.length-1) {
-      returnObj = { "finalStep": stepx, "finalIdx":stepxIdx, "pC": _pCount, "aC": _aCount};
-      //finalStep = stepx;  // Array of Big() numbers
-      //finalIdx = stepxIdx;
-    }
-  }
-  return returnObj;
-}
 
 function calculateStats(finalIdx, finalStep) {
 
@@ -732,44 +690,27 @@ function statWarnClearAndCalc() {
   //$("#warningStatsDiv").empty();
   //$("#statWarnTarget").addClass("greyout");
 
-  var prom = new Promise(function (res, rej) {
-    res();
-  });
-  $("#warningStatsDiv").empty(statWarnSpinner);
-  prom.then(actuallyCalculateDice).then(function() {
+  $("#warningStatsDiv").empty();
+  statWarnSpinner();
+  $("#warningStatsDiv").hide().show(0);
+
+
+  setTimeout(function() {
+    actuallyCalculateDice();
     $("#warningStatsDiv").empty();
     $("#statWarnTarget").show();
-  });
-  /*
-  var step1 = function() {
-    //debugger;
-    var p1 = new Promise(statWarnSpinner);
-    return p1;
-  }
-  var step2 = function() {
-    debugger;
-    var p2 = new Promise(actuallyCalculateDice);
-    return p2;
-  }
+    $(document).scrollTop($("#statWarnTarget").position().top);
+  }, 500);
 
-  var step3 = function () {
-    var p3 = new Promise(function() {
-
-    });
-    return p3;
-  }
-
-  step1().then(step2).then(step3);
-  */
-
-  //setTimeout(actuallyCalculateDice(), 100);
 }
 
 function statWarnSpinner() {
   $("#warningStatsDiv").empty();
   $("#warningStatsDiv").append(
     $("<div>").addClass("alert alert-dark").append(
-      $("<i>").addClass("fa fa-spinner fa-spin fa-lg fa-fw")
+      $("<div>").addClass("-stat-warn-alert").append(
+        $("<i>").addClass("fa fa-spinner fa-spin fa-lg fa-fw")
+      ).append("Calculating...")
     )
   );
 }

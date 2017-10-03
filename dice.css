@@ -135,6 +135,11 @@ body {
   opacity: 0.3;
 }
 
+.-stat-warn-alert {
+  width: fit-content;
+  margin: auto;
+}
+
 .-tbl-lbl {
   width: 12rem;
 }
