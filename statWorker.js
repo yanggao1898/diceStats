@@ -7,7 +7,26 @@ Recieve:  - Start calculations
 
 //*/
 
-function calculateDiceCore(workArr, steps) {
+self.importScripts("https://rawgit.com/MikeMcl/big.js/master/big.js");
+
+self.addEventListener("message", function(e) {
+  var data = e.data;
+  switch(data.cmd) {
+    case "proc":
+      var workArr = data.workArr;
+      var steps = data.steps;
+      calculateDiceCore(workArr, steps, replyResult);
+      break;
+  }
+}, false);
+
+function replyResult(returnObj) {
+
+  debugger;
+  self.postMessage({"result": JSON.stringify(returnObj)});
+}
+
+function calculateDiceCore(workArr, steps, callback) {
   var stepx;
   var stepxArr;
   var stepxIdx;
@@ -47,5 +66,6 @@ function calculateDiceCore(workArr, steps) {
       //finalIdx = stepxIdx;
     }
   }
-  return returnObj;
+  //debugger;
+  callback(returnObj);
 }

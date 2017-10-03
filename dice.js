@@ -1,5 +1,6 @@
 var ___dice = {"dice" : {}, "settings" : {}, "meta" : {}};
 var ___stats = {};
+var ___WORKERACTIVE = false;
 var ___profiler = (function() {
   var avg = 0.01;
   var perf = [];
@@ -458,12 +459,32 @@ function calculateDiceWrapper() {
       }
     }
     step0Idx.forEach( function(el) {
-      step0[el] = Big(step0[el]);
+      step0[el] = step0[el];
     });
     finalStep = step0;
     finalIdx = step0Idx;
     steps[0] = {"idx": step0Idx, "val": step0};
   }
+
+  if(typeof(Worker) !== "undefined") {
+    if (___WORKERACTIVE == false) {
+      ___WORKERACTIVE = new Worker("statWorker.js");
+      ___WORKERACTIVE.addEventListener("message", processWorkerResponse);
+    }
+    debugger;
+    // NEED TO ADD CODE TO CHECK WORKER BUSY STATUS LATER
+    ___WORKERACTIVE.postMessage({"cmd": "proc", "workArr": workArr, "steps": steps});
+  } else {
+      alert("Sorry! No Web Worker support.");
+      var coreResults = calculateDiceCore(workArr, steps);
+      /*//
+        Could potentially add compatibility code here
+        but probably not needed, since the browser might not have
+        web storage anyways. Or other modern functionality
+        for that matter.
+      //*/
+  }
+
 
   //debugger;
 
@@ -481,13 +502,26 @@ function calculateDiceWrapper() {
   benchTime = 0;
   //*/
   //for (var bi = 0; bi < benchIdx; bi++) {
+
+  //} else {
+  //  return avgTime;
+  //}
+}
+
+function processWorkerResponse(e) {
+  debugger;
+  var data = e.data;
+
   var __t1, __t2, __pCounter, __aCounter;
   var benchTime;
   __t1 = performance.now();
   //__pCounter = 0;
   //__aCounter = 0;
 
-  var coreResults = calculateDiceCore(workArr, steps);
+  //////////////////////////
+  //DICE CORE CALCULATIONS//
+  //////////////////////////
+
 
   __t2 = performance.now();
   //if (bench) {
@@ -515,9 +549,6 @@ function calculateDiceWrapper() {
 
   //if (!bench) {
   return {"finalIdx": coreResults.finalIdx, "finalStep": coreResults.finalStep};
-  //} else {
-  //  return avgTime;
-  //}
 }
 
 
@@ -728,7 +759,7 @@ function actuallyCalculateDice() {
   console.log("starting dice raw");
   var diceStatsRaw = calculateDiceWrapper();
   console.log("finished dice raw");
-  calculateStats(diceStatsRaw.finalIdx, diceStatsRaw.finalStep);
+  //calculateStats(diceStatsRaw.finalIdx, diceStatsRaw.finalStep);
 }
 
 // Long way to calculate Mean
