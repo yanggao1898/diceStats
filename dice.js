@@ -118,24 +118,17 @@ var ___bench = (function() {
   return Number.parseFloat(mspc.toFixed(5));
 })();
 
-function ___Estimator(dFace, rolls) {
-  if (rolls <= 0) {
-    console.log("Rolls: " + rolls);
-    debugger;
-    return Big(0);
-  }
-  var bF = Big(dFace);
-  var bR = Big(rolls);
+var ___Estimator = (function() {
+  var last = 0;
 
-  // (0.5d^2 - 0.5d)x^2 - (0.5d^2 - 1.5d)x - d
-  var ans = bF.pow(2).times(0.5).minus(bF.times(0.5)).times(bR.pow(2)).minus(
-    bF.pow(2).times(0.5).minus(bF.times(1.5)).times(bR)
-  ).minus(bF);
-
-  console.log("For " + rolls + " d" + dFace + ": " + ans.toString() + " ops");
-
-  return ans;
-}
+  return({
+    "last": last,
+    "calc": function(dices) {
+      this.last = ___Estimator2(dices);
+      return this.last;
+    }
+  })
+})();
 
 function ___Estimator2(dices) {
   if (dices.length == 0) {
@@ -396,7 +389,7 @@ function estimateTime() {
     }
     //diceCount.push([allDices[i], dVal]);
   }
-  totOps = ___Estimator2(dices);
+  totOps = ___Estimator.calc(dices);
 
   //console.log("Estimated Ops: " + totOps);
 
@@ -426,21 +419,12 @@ function calculateDiceWrapper() {
     diceCount.push([allDices[i], dVal]);
   }
 
-  //var totOps = 0;
-
-  //for (i = 0; i < diceCount.length; i++) {}
-
-
   for (i = 0; i < diceCount.length; i++) {
     //totOps += ___Estimator(___dice.dice[diceCount[i][0]].numFaces, diceCount[i][1]);
     for (var j = 0; j < diceCount[i][1]; j++) {
       workArr.push(___dice.dice[diceCount[i][0]].faces.slice());
     }
   }
-
-
-
-  //var rollResult = rollDice(diceCount);
 
   var steps = {};
   var finalStep;
@@ -471,7 +455,7 @@ function calculateDiceWrapper() {
       ___WORKERACTIVE = new Worker("statWorker.js");
       ___WORKERACTIVE.addEventListener("message", processWorkerResponse);
     }
-    debugger;
+    //debugger;
     // NEED TO ADD CODE TO CHECK WORKER BUSY STATUS LATER
     ___WORKERACTIVE.postMessage({"cmd": "proc", "workArr": workArr, "steps": steps});
   } else {
@@ -488,67 +472,75 @@ function calculateDiceWrapper() {
 
   //debugger;
 
-  /*// Benchmarking code
-  var __stepsOriginal = JSON.parse(JSON.stringify(steps));
 
-
-
-
-  if (Number.isInteger(bench)) {
-    benchIdx = bench;
-  } else {
-    benchIdx = 1;
-  }
-  benchTime = 0;
-  //*/
-  //for (var bi = 0; bi < benchIdx; bi++) {
-
-  //} else {
-  //  return avgTime;
-  //}
 }
 
 function processWorkerResponse(e) {
-  debugger;
+  //debugger;
   var data = e.data;
 
+  //debugger;
+  if (data.type == "result") {
+    processWorkerResult(data.data);
+  } else if (data.type == "prog") {
+    processWorkerProgress(data.data);
+  }
+
+}
+
+function processWorkerProgress(data) {
+  var prog = (data*100/___Estimator.last).toFixed(2);
+  $("#statAlertProgress").text(prog + "%");
+}
+
+function processWorkerResult(data) {
+  function stepToBig(step) {
+    //debugger;
+    var retStep = {};
+    var stepKeys = Object.keys(step);
+    stepKeys.forEach(function (el) {
+      retStep[el] = Big(step[el]);
+    });
+    return retStep;
+  }
+  var finalStep, finalIdx;
   var __t1, __t2, __pCounter, __aCounter;
-  var benchTime;
-  __t1 = performance.now();
-  //__pCounter = 0;
-  //__aCounter = 0;
+  //var benchTime;
+  //__t1 = performance.now();
+  //__t2 = performance.now();
+  //benchTime += __t2-__t1;
 
-  //////////////////////////
-  //DICE CORE CALCULATIONS//
-  //////////////////////////
+  var result = JSON.parse(data);
+  finalStep = stepToBig(result.finalStep);
+  finalIdx = result.finalIdx;
 
 
-  __t2 = performance.now();
-  //if (bench) {
-  benchTime += __t2-__t1;
-  __pCounter = coreResults.pC;
-  __aCounter = coreResults.aC;
-  //steps = JSON.parse(JSON.stringify(__stepsOriginal));
-    //}
-
-  //}
-  /*//
-  var avgTime = (benchTime/benchIdx);
-  //*/
+  __pCounter = result.pC;
+  __aCounter = result.aC;
 
   //console.log("Avg DURATION: " + (avgTime));
   //console.log("benchTime: " + benchTime);
   //console.log("PCounter: " + __pCounter);
   //console.log("ACounter: " + __aCounter);
   console.log("Total Ops: " + (__pCounter + __aCounter));
+  console.log("Total Time: " + result.time);
 
+  /*//
   if(benchTime > 25) {
     var mspc = benchTime / (__pCounter+__aCounter);
     ___profiler.add(Number.parseFloat(mspc.toFixed(5)));
   }
+  //*/
 
-  //if (!bench) {
-  return {"finalIdx": coreResults.finalIdx, "finalStep": coreResults.finalStep};
+  workerDone({"finalIdx": finalIdx, "finalStep": finalStep});
+
+}
+
+function workerDone(returnObj) {
+  calculateStats(returnObj.finalIdx, returnObj.finalStep);
+  $("#warningStatsDiv").empty();
+  $("#statWarnTarget").show();
+  $(document).scrollTop($("#statWarnTarget").position().top);
 }
 
 
@@ -608,18 +600,7 @@ function calculateStats(finalIdx, finalStep) {
   } else {
     $("#modeData").text("No Mode");
   }
-  /*$("#modeData").text( (function() {
-    if (mode && mode.length > 0) {
-      var mText = mode[0][0] + " @ " + Math.round(mode[0][1] * 10000)/100 + " %";
 
-      for (var i = 1; i < mode.length; i++) {
-        mText += ", " + mode[i][0] + " @ " + Math.round(mode[i][1] * 10000)/100 + " %";
-      }
-      return mText;
-    }
-    return "No Mode";
-  })() );
-  //*/
   if (parseInt(stdev)) {
     $("#stdevData").text(stdev);
     ___stats.stdev = stdev;
@@ -643,7 +624,7 @@ function calculateDice(e) {
     $("#statWarnTarget").hide();
     $("#warningStatsDiv").append(
       $("<div>").addClass("alert alert-primary stat-warn stat-warn-ok").attr("id", "statWarnOk").text(
-        "Show stats"
+        "Calculate stats"
       )
     );
     return;
@@ -658,7 +639,7 @@ function calculateDice(e) {
       $("#statWarnTarget").hide();
       $("#warningStatsDiv").append(
         $("<div>").addClass("alert alert-info stat-warn stat-warn-ok").attr("id", "statWarnFast").text(
-          "Show stats (This may take " + eTLo + " to " + eTHi + " seconds)"
+          "Calculate stats (This may take " + eTLo + " to " + eTHi + " seconds)"
         )
       );
       return;
@@ -673,7 +654,7 @@ function calculateDice(e) {
             "data-target": "#statWarnConfirmAlert"
           }
         ).text(
-          "Show stats (This may take " + eTLo + " to " + eTHi + " seconds!)"
+          "Calculate stats (This may take " + eTLo + " to " + eTHi + " seconds!)"
         )
       );
       return;
@@ -702,7 +683,7 @@ function calculateDice(e) {
             "data-target": "#statWarnConfirmAlert"
           }
         ).html(
-          "Show stats (THIS WILL TAKE A LONG TIME!) <br>" +
+          "Calculate stats (THIS WILL TAKE A LONG TIME!) <br>" +
           "Estimated to take: " + eTLo + " to " + eTHi + longUnit
         )
       );
@@ -722,31 +703,17 @@ function statWarnClearAndCalc() {
   //$("#statWarnTarget").addClass("greyout");
 
   $("#warningStatsDiv").empty();
-  statWarnSpinner();
-  $("#warningStatsDiv").hide().show(0);
-
-
-  setTimeout(function() {
-    actuallyCalculateDice();
-    $("#warningStatsDiv").empty();
-    $("#statWarnTarget").show();
-    $(document).scrollTop($("#statWarnTarget").position().top);
-  }, 500);
-
-}
-
-function statWarnSpinner() {
-  $("#warningStatsDiv").empty();
   $("#warningStatsDiv").append(
     $("<div>").addClass("alert alert-dark").append(
       $("<div>").addClass("-stat-warn-alert").append(
         $("<i>").addClass("fa fa-spinner fa-spin fa-lg fa-fw")
-      ).append("Calculating...")
+      ).append("Calculating... ").append(
+        $("<div>").prop({"id": "statAlertProgress"}).text("0%")
+      )
     )
   );
+  actuallyCalculateDice();
 }
-
-
 
 function statWarnConfirm() {
   console.log("confirm");

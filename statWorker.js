@@ -9,34 +9,46 @@ Recieve:  - Start calculations
 
 self.importScripts("https://rawgit.com/MikeMcl/big.js/master/big.js");
 
+var _aCount = 0;
+var _pCount = 0;
+
 self.addEventListener("message", function(e) {
   var data = e.data;
   switch(data.cmd) {
     case "proc":
       var workArr = data.workArr;
       var steps = data.steps;
-      calculateDiceCore(workArr, steps, replyResult);
+      calculateDiceCore(workArr, steps);
       break;
   }
 }, false);
 
 function replyResult(returnObj) {
 
-  debugger;
-  self.postMessage({"result": JSON.stringify(returnObj)});
+  //debugger;
+  self.postMessage({"type": "result", "data": JSON.stringify(returnObj)});
 }
 
-function calculateDiceCore(workArr, steps, callback) {
+function sendProgress(prog) {
+  self.postMessage({"type": "prog", "data": prog});
+}
+
+function calculateDiceCore(workArr, steps) {
   var stepx;
   var stepxArr;
   var stepxIdx;
   var i, si;
   var sIdxi;
   var tmpStpVal;
-  var _aCount = 0;
-  var _pCount = 0;
+  var t1, t2, tStep;
+
+  _aCount = 0;
+  _pCount = 0;
 
   var returnObj;
+
+  t1 = performance.now();
+  tStep = t1;
   for (i = 0; i < workArr.length; i++ ) {
     stepx = {};
     stepxArr = workArr[i];
@@ -56,6 +68,10 @@ function calculateDiceCore(workArr, steps, callback) {
           stepxIdx.push(tmpStpVal);
         }
       }
+      if(performance.now() - tStep > 500) {
+        tStep = performance.now();
+        sendProgress(_pCount + _aCount);
+      }
     }
 
     steps[i+1] = {"idx": stepxIdx, "val": stepx}
@@ -66,6 +82,8 @@ function calculateDiceCore(workArr, steps, callback) {
       //finalIdx = stepxIdx;
     }
   }
+  t2 = performance.now();
+  returnObj["time"] = t2-t1;
   //debugger;
-  callback(returnObj);
+  replyResult(returnObj);
 }
