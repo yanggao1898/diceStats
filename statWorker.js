@@ -30,7 +30,7 @@ function replyResult(returnObj) {
 }
 
 function sendProgress(prog) {
-  self.postMessage({"type": "prog", "data": prog});
+  self.postMessage({"type": "prog", "data": JSON.stringify(prog)});
 }
 
 function calculateDiceCore(workArr, steps) {
@@ -41,13 +41,14 @@ function calculateDiceCore(workArr, steps) {
   var sIdxi;
   var tmpStpVal;
   var t1, t2, tStep;
+  var perf = performance;
 
   _aCount = 0;
   _pCount = 0;
 
   var returnObj;
 
-  t1 = performance.now();
+  t1 = perf.now();
   tStep = t1;
   for (i = 0; i < workArr.length; i++ ) {
     stepx = {};
@@ -68,9 +69,11 @@ function calculateDiceCore(workArr, steps) {
           stepxIdx.push(tmpStpVal);
         }
       }
-      if(performance.now() - tStep > 500) {
-        tStep = performance.now();
-        sendProgress(_pCount + _aCount);
+      var tmpT = perf.now();
+      if(tmpT - tStep > 500) {
+        sendProgress({"count" : _pCount + _aCount, "timer" : tmpT - t1});
+        tStep = perf.now();
+        //sendProgress(_pCount + _aCount);
       }
     }
 
@@ -82,7 +85,7 @@ function calculateDiceCore(workArr, steps) {
       //finalIdx = stepxIdx;
     }
   }
-  t2 = performance.now();
+  t2 = perf.now();
   returnObj["time"] = t2-t1;
   //debugger;
   replyResult(returnObj);

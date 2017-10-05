@@ -398,14 +398,6 @@ function estimateTime() {
   return time;
 }
 
-function calculateDiceRaw(bench) {
-  //console.log("started");
-  //debugger;
-
-  //;
-
-}
-
 function calculateDiceWrapper() {
   var allDices = $("#dices").find("[id]").map(function () {
     return $(this).data("dice_id");
@@ -451,10 +443,11 @@ function calculateDiceWrapper() {
   }
 
   if(typeof(Worker) !== "undefined") {
-    if (___WORKERACTIVE == false) {
-      ___WORKERACTIVE = new Worker("statWorker.js");
-      ___WORKERACTIVE.addEventListener("message", processWorkerResponse);
+    if (___WORKERACTIVE != false) {
+      ___WORKERACTIVE.terminate();
     }
+    ___WORKERACTIVE = new Worker("statWorker.js");
+    ___WORKERACTIVE.addEventListener("message", processWorkerResponse);
     //debugger;
     // NEED TO ADD CODE TO CHECK WORKER BUSY STATUS LATER
     ___WORKERACTIVE.postMessage({"cmd": "proc", "workArr": workArr, "steps": steps});
@@ -489,8 +482,11 @@ function processWorkerResponse(e) {
 }
 
 function processWorkerProgress(data) {
-  var prog = (data*100/___Estimator.last).toFixed(2);
-  $("#statAlertProgress").text(prog + "%");
+  var pData = JSON.parse(data);
+  var prog = (pData.count*100/___Estimator.last).toFixed(2);
+  $("#statAlertProgress").text(
+    prog + "%"
+  ).css("width", prog + "%");
 }
 
 function processWorkerResult(data) {
@@ -504,33 +500,23 @@ function processWorkerResult(data) {
     return retStep;
   }
   var finalStep, finalIdx;
-  var __t1, __t2, __pCounter, __aCounter;
-  //var benchTime;
-  //__t1 = performance.now();
-  //__t2 = performance.now();
-  //benchTime += __t2-__t1;
+  var pCounter, aCounter;
+
 
   var result = JSON.parse(data);
   finalStep = stepToBig(result.finalStep);
   finalIdx = result.finalIdx;
 
 
-  __pCounter = result.pC;
-  __aCounter = result.aC;
+  pCounter = result.pC;
+  aCounter = result.aC;
 
   //console.log("Avg DURATION: " + (avgTime));
   //console.log("benchTime: " + benchTime);
   //console.log("PCounter: " + __pCounter);
   //console.log("ACounter: " + __aCounter);
-  console.log("Total Ops: " + (__pCounter + __aCounter));
+  console.log("Total Ops: " + (pCounter + aCounter));
   console.log("Total Time: " + result.time);
-
-  /*//
-  if(benchTime > 25) {
-    var mspc = benchTime / (__pCounter+__aCounter);
-    ___profiler.add(Number.parseFloat(mspc.toFixed(5)));
-  }
-  //*/
 
   workerDone({"finalIdx": finalIdx, "finalStep": finalStep});
 
@@ -571,25 +557,17 @@ function calculateStats(finalIdx, finalStep) {
   } else {
     $("#rangeData").text("No Range");
   }
-  //$("#rangeData").text(range ? range[0] + " - " + range[1] : "No Range");
-
   if (mean && parseInt(mean.toString())) {
     $("#meanData").text(mean.toString());
     ___stats.mean = mean;
   } else {
     $("#meanData").text("No Mean");
   }
-  //$("#meanData").text(mean ? mean : "No Mean");
-
   if (median && median.length > 0) {
     $("#medianData").text(median[0] + " @ " + median[1].times(100).round().toString() + " %");
   } else {
     $("#medianData").text("No Median");
   }
-  /*$("#medianData").text(median ?
-                            (median.length > 0) ? median[0] + " @ " + Math.round(median[1] * 100) + " %" : "No Median"
-                          : "No Median");
-  //*/
   if (mode && mode.length > 0) {
     var mText = mode[0][0] + " @ " + mode[0][1].times(10000).round().div(100).toString() + " %";
 
@@ -607,12 +585,12 @@ function calculateStats(finalIdx, finalStep) {
   } else {
     $("#stdevData").text("No Standard Deviation");
   }
-  //$("#stdevData").text(stdev ? stdev : "No Standard Deviation");
-  //$('#statTable').DataTable();
-  //debugger;
 }
 
 function calculateDice(e) {
+  if (typeof(Worker) !== "undefined" && ___WORKERACTIVE != false) {
+    ___WORKERACTIVE.terminate();
+  }
   var estTime = estimateTime();
   $("#statWarnTarget").show();
 
@@ -687,46 +665,31 @@ function calculateDice(e) {
           "Estimated to take: " + eTLo + " to " + eTHi + longUnit
         )
       );
-      return;
+      //return;
     }
+  } else {
+    calculateDiceWrapper();
   }
-
-
-
-  actuallyCalculateDice();
-  //console.log("Estimated time required: " + estTime);
-
-}
-
-function statWarnClearAndCalc() {
-  //$("#warningStatsDiv").empty();
-  //$("#statWarnTarget").addClass("greyout");
-
-  $("#warningStatsDiv").empty();
-  $("#warningStatsDiv").append(
-    $("<div>").addClass("alert alert-dark").append(
-      $("<div>").addClass("-stat-warn-alert").append(
-        $("<i>").addClass("fa fa-spinner fa-spin fa-lg fa-fw")
-      ).append("Calculating... ").append(
-        $("<div>").prop({"id": "statAlertProgress"}).text("0%")
-      )
-    )
-  );
-  actuallyCalculateDice();
 }
 
 function statWarnConfirm() {
   console.log("confirm");
-  //if ($(""))
-  //$("#statWarnModalYesBtn").prop("disabled", true);
-  statWarnClearAndCalc();
-}
-
-function actuallyCalculateDice() {
-  console.log("starting dice raw");
-  var diceStatsRaw = calculateDiceWrapper();
-  console.log("finished dice raw");
-  //calculateStats(diceStatsRaw.finalIdx, diceStatsRaw.finalStep);
+  $("#warningStatsDiv").empty();
+  $("#warningStatsDiv").append(
+    $("<div>").addClass("alert alert-dark").append(
+      $("<div>").addClass("progress").append(
+        //$("<i>").addClass("fa fa-spinner fa-spin fa-lg fa-fw")
+      //).append("Calculating... ").append(
+        $("<div>").prop(
+          {"id": "statAlertProgress"}
+        ).text("0%").addClass(
+          "progress-bar progress-bar-striped progress-bar-animated"
+        )
+        //$("<div>").
+      )
+    )
+  );
+  calculateDiceWrapper();
 }
 
 // Long way to calculate Mean
@@ -1346,7 +1309,7 @@ function init() {
   $("#diceEditModal").on("change", ".modal-table-sym-entry", modalValSymChange);
   $("#diceEditModal").on("change", ".pick_color", updateColors);
 
-  $("#warningStatsDiv").on("click", ".stat-warn-ok", statWarnClearAndCalc);
+  $("#warningStatsDiv").on("click", ".stat-warn-ok", statWarnConfirm);
   $("#statWarnModalBody").on("click", "#statWarnModalYesBtn", statWarnConfirm);
   $("#clearRollBtn").click(clearRolls);
 
