@@ -14,6 +14,6 @@ Colorize the Total number based on distance (in stdev) from expected Mean.
 
 Estimate speed of stdev calculations. Do not auto-calculate if expected time is too long.
   x- Give option to manually start the calculations. Give estimate of time.
-  - if the manual option is clicked, show the stats table with a progress indication over the table during the calculations
-    - progress indicator can be a spinner at first
-      - Maybe a progress bar later?
+  x if the manual option is clicked, show the stats table with a progress indication over the table during the calculations
+    x progress indicator can be a spinner at first
+      x Maybe a progress bar later?
