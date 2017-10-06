@@ -1185,7 +1185,7 @@ function modalSymbolChange(e) {
 function getTextColor(bgc) {
   var colorTest = document.createElement("div");
   colorTest.style.color = bgc;
-  document.body.append(colorTest);
+  document.body.appendChild(colorTest);
   var rgbStr = window.getComputedStyle(colorTest).color;
   document.body.removeChild(colorTest);
 
