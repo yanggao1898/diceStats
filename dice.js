@@ -1,4 +1,4 @@
-var ___dice = {"dice" : {}, "settings" : {}, "meta" : {}};
+
 var ___stats = {};
 var ___WORKERACTIVE = false;
 var ___profiler = (function() {
@@ -845,7 +845,8 @@ function processAddDiceMenu(e) {
 
     // ADD DICE TO POOL LIST
     var dEntry = createDicePoolEntry(dId);
-    $("#dicePool").append(dEntry);
+    addDiceEntryToGroup(dEntry);
+    //$("#dicePool").append(dEntry);
 
     // ADD DICE TO DICECOUNT TAB
     addUseDiceFromPool(dId);
@@ -853,6 +854,23 @@ function processAddDiceMenu(e) {
     // SCROLL EDIT PANE TO SHOW NEW DICE
     $("#diceEditScroll").scrollTop($("#"+dId).offset().top)
   }
+}
+
+function addDiceEntryToGroup(dEntry, dgId) {
+  if(dgId == null || dgId == undefined) {
+    dgId = "UserAdded";
+  }
+  var dId = dEntry.attr("id");
+
+  ___dice.diceGroups[dgId].members.push(dId);
+
+  var grpCard = $("#"+dgId);
+  if (grpCard.length == 0) {
+    grpCard = createDiceGroupCard(dgId);
+  }
+  grpCard.find(".card-body").append(dEntry);
+
+  $("#dicePool").append(grpCard);
 }
 
 function addDiceToNS(dId, dLabel, dSides) {
@@ -867,9 +885,29 @@ function addDiceToNS(dId, dLabel, dSides) {
     "faces" : range,
     "symbols" : syms,
     "color" : "white",
-    "visible" : true
+    "visible" : true,
+    "group" : ""
   };
+  ___dice.diceGroups.UserAdded.members.push(dId);
   storeLS();
+}
+
+function createDiceGroupCard(gId) {
+  var label = ___dice.diceGroups[gId].label;
+
+  var cDiv = $("<div>").addClass("card").attr("id", gId);
+  var chDiv = $("<div>").addClass("card-header");
+  var cbDiv = $("<div>").addClass("card-body dice_pool_entry-card-body");
+  var cardBGC = $("body").css("background-color");
+  chDiv.append(
+    $("<h6>").addClass("card-title").text(label).css(
+      "color", getTextColor(cardBGC)
+    )
+  );
+  cDiv.append(chDiv);
+  cDiv.append(cbDiv);
+
+  return cDiv;
 }
 
 function createDicePoolEntry(id) {
@@ -1263,17 +1301,47 @@ function initializeSymbols() {
   ___dice.settings.symbols = ["fa-sun-o", "fa-diamond", "fa-cog", "fa-gear"];
 }
 
+function initializeDice() {
+  var diceKeys = Object.keys(___dice.dice);
+  var groupKeys = Object.keys(___dice.diceGroups);
+  var gCard, gCBody;
+
+  groupKeys.forEach(function(gId) {
+    if(___dice.diceGroups[gId].members.length > 0) {
+      gCard = createDiceGroupCard(gId);
+
+      $("#dicePool").append(gCard);
+
+      ___dice.diceGroups[gId].members.forEach(function(dId) {
+        gCBody = $("#" + gId + " .card-body");
+        gCBody.append(createDicePoolEntry(dId));
+        addUseDiceFromPool(dId);
+
+      });
+    }
+  });
+  /*
+  diceKeys.forEach(function (dId) {
+    $("#dicePool").append(createDicePoolEntry(dId));
+    addUseDiceFromPool(dId);
+  });
+  */
+}
+
 function init() {
-  ___dice.dice.d6_DarkSouls_black = {"label" : "DS-Black", "numFaces": 6, "faces" : [0, 1, 1, 1, 2, 2], "symbols" : new Array(6).fill(null), "color": "black", "visible": true}
-  ___dice.dice.d6_DarkSouls_blue = {"label" : "DS-Blue", "numFaces": 6, "faces" : [1, 2, 2, 2, 3, 3], "symbols" : new Array(6).fill(null), "color" : "blue", "visible": true}
-  ___dice.dice.d6_DarkSouls_orange = {"label" : "DS-Orange", "numFaces": 6, "faces" : [1, 2, 2, 3, 3, 4], "symbols" : new Array(6).fill(null), "color": "orange", "visible": true}
+  /*//
+  ___dice.dice.d6_DarkSouls_black = {"label" : "DS-Black", "numFaces": 6, "faces" : [0, 1, 1, 1, 2, 2], "symbols" : new Array(6).fill(null), "color": "black", "visible": true, "group": "Dark Souls"}
+  ___dice.dice.d6_DarkSouls_blue = {"label" : "DS-Blue", "numFaces": 6, "faces" : [1, 2, 2, 2, 3, 3], "symbols" : new Array(6).fill(null), "color" : "blue", "visible": true, "group": "Dark Souls"}
+  ___dice.dice.d6_DarkSouls_orange = {"label" : "DS-Orange", "numFaces": 6, "faces" : [1, 2, 2, 3, 3, 4], "symbols" : new Array(6).fill(null), "color": "orange", "visible": true, "group": "Dark Souls"}
 
-  ___dice.dice.d6_MassiveDarknes_red = {"label" : "MD-Red", "numFaces": 6, "faces" : [0, 1, 1, 2, 2, 3], "symbols" : [,,,"fa-sun-o", "fa-sun-o", "fa-diamond"], "color": "orangered", "visible": true}
-  ___dice.dice.d6_MassiveDarknes_yellow = {"label" : "MD-Yellow", "numFaces": 6, "faces" : [0, 1, 1, 1, 1, 2], "symbols" : [,,,,,"fa-sun-o"], "color" : "gold", "visible": true}
-  ___dice.dice.d6_MassiveDarknes_blue = {"label" : "MD-Blue", "numFaces": 6, "faces" : [0, 0, 1, 1, 1, 2], "symbols" : [,,,,,"fa-sun-o"], "color": "skyblue", "visible": true}
-  ___dice.dice.d6_MassiveDarknes_green = {"label" : "MD-Green", "numFaces": 6, "faces" : [0, 0, 1, 2, 2, 3], "symbols" : [,,,"fa-sun-o", "fa-sun-o", "fa-diamond"], "color": "lawngreen", "visible": true}
-  ___dice.meta.version = 0.1;
+  ___dice.dice.d6_MassiveDarknes_red = {"label" : "MD-Red", "numFaces": 6, "faces" : [0, 1, 1, 2, 2, 3], "symbols" : [,,,"fa-sun-o", "fa-sun-o", "fa-diamond"], "color": "orangered", "visible": true, "group": "Massive Darkness"}
+  ___dice.dice.d6_MassiveDarknes_yellow = {"label" : "MD-Yellow", "numFaces": 6, "faces" : [0, 1, 1, 1, 1, 2], "symbols" : [,,,,,"fa-sun-o"], "color" : "gold", "visible": true, "group": "Massive Darkness"}
+  ___dice.dice.d6_MassiveDarknes_blue = {"label" : "MD-Blue", "numFaces": 6, "faces" : [0, 0, 1, 1, 1, 2], "symbols" : [,,,,,"fa-sun-o"], "color": "skyblue", "visible": true, "group": "Massive Darkness"}
+  ___dice.dice.d6_MassiveDarknes_green = {"label" : "MD-Green", "numFaces": 6, "faces" : [0, 0, 1, 2, 2, 3], "symbols" : [,,,"fa-sun-o", "fa-sun-o", "fa-diamond"], "color": "lawngreen", "visible": true, "group": "Massive Darkness"}
+  ___dice.meta.version = 0.2;
+  //*/
 
+  // needs code for version compatibility check later
   if(localStorage.userDice) {
     restoreLS();
   } else {
@@ -1282,13 +1350,9 @@ function init() {
 
   initializeRandom();
   initializeSymbols();
+  initializeDice();
 
-  var diceKeys = Object.keys(___dice.dice);
-  var dEntry;
-  diceKeys.forEach(function (dId) {
-    $("#dicePool").append(createDicePoolEntry(dId));
-    addUseDiceFromPool(dId);
-  });
+
 
   $("#dices").change(calculateDice);
   $("#rollDiceBtn").click(rollDice);
@@ -1313,18 +1377,6 @@ function init() {
   $("#statWarnModalBody").on("click", "#statWarnModalYesBtn", statWarnConfirm);
   $("#clearRollBtn").click(clearRolls);
 
-  //$("#diceCountScroll").on("scroll", _.throttle(hideTabOnScroll, 50));
-  //$("#diceCountScroll").promise().done()
-
-  /*
-  $('a[data-toggle="tab"][href="#diceEdit"]').on("shown.bs.tab", function(e) {
-    $("#dicePoolOptions").show();
-  });
-
-  $('a[data-toggle="tab"][href="#diceEdit"]').on("hidden.bs.tab", function(e) {
-    $("#dicePoolOptions").hide();
-  });
-  */
 
   if($("#statTable").is(":visible")) {
     $("#statsToggleBtn").text("Hide Stats");
@@ -1332,24 +1384,8 @@ function init() {
     $("#statsToggleBtn").text("Show Stats");
   }
 
-  //___Benchmark();
-
 }
 
-/*
-Massive Darkness Dice:
-Red (attack): 0 1 1 2 2 3
-Yellow (atk): 0 1 1 1 1 2
-Blue (def):   0 0 1 1 1 2
-Green (def):  0 0 1 2 2 3
 
-___dice.d6_MassiveDarknes_red = {"label" : "Red", "faces" : [0, 1, 1, 2, 2, 3], "color": "orangered"}
-___dice.d6_MassiveDarknes_yellow = {"label" : "Yellow", "faces" : [0, 1, 1, 1, 1, 2], "color" : "gold"}
-___dice.d6_MassiveDarknes_blue = {"label" : "Blue", "faces" : [0, 0, 1, 1, 1, 2], "color": "skyblue"}
-___dice.d6_MassiveDarknes_green = {"label" : "Green", "faces" : [0, 0, 1, 2, 2, 3], "color": "lawngreen"}
-
-
-
-//*/
 //window.addEventListener("DOMContentLoaded", init);
 $(init);

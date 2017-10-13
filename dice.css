@@ -59,7 +59,20 @@ span.dice-roll-result + span.dice-roll-result {
 
 }
 
+.card {
+  background-color: inherit;
+}
 
+.card-body {
+  max-height: min-content;
+}
+
+.dice_pool_entry-card-body {
+  padding-left: 0px;
+  padding-right: 0px;
+  display: flex;
+  flex-wrap: wrap;
+}
 
 .scroll-y {
   overflow-y: auto;
@@ -117,6 +130,10 @@ body {
 
 .-flex-wrap {
   flex-flow: wrap;
+}
+
+.-flex-column {
+  flex-direction: column;
 }
 
 .-edit-dice-val {
