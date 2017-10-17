@@ -847,7 +847,8 @@ function processAddDiceMenu(e) {
     var dEntry = createDicePoolEntry(dId);
     addDiceEntryToGroup(dEntry);
     //$("#dicePool").append(dEntry);
-
+    storeLS();
+    
     // ADD DICE TO DICECOUNT TAB
     addUseDiceFromPool(dId);
 
@@ -888,8 +889,8 @@ function addDiceToNS(dId, dLabel, dSides) {
     "visible" : true,
     "group" : ""
   };
-  ___dice.diceGroups.UserAdded.members.push(dId);
-  storeLS();
+  //___dice.diceGroups.UserAdded.members.push(dId);
+
 }
 
 function createDiceGroupCard(gId) {
@@ -1026,8 +1027,11 @@ function delUseDiceFromPool(dId) {
 
 
 function deleteDicePoolEntry(e) {
+  debugger;
   var delTarget = e.target.closest("div.dice_pool_entry");
   var dId = delTarget.id;
+  var delGrp = e.target.closest("div.card");
+  var gId = delGrp.id;
 
   // REMOVE FROM DICECOUNT TAB
   delUseDiceFromPool(dId);
@@ -1037,6 +1041,11 @@ function deleteDicePoolEntry(e) {
 
   // DELETE GLOBAL NS ENTRY
   delete ___dice.dice[dId];
+  ___dice.diceGroups[gId].members.splice(
+    ___dice.diceGroups[gId].members.indexOf(dId), 1
+  );
+
+  //___dice.diceGroups["UserAdded"].members.indexOf("d12_852458317")
   storeLS();
 }
 

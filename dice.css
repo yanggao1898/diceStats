@@ -1,7 +1,3 @@
-span.dice-roll-result + span.dice-roll-result {
-  margin-left: 0.1em;
-}
-
 @media (max-width: 1199px) {
   .show-in-lg {
     display: none;
@@ -37,6 +33,14 @@ span.dice-roll-result + span.dice-roll-result {
   .collapse.show.d-flex {
     display:flex!important;
   }
+}
+
+span.dice-roll-result + span.dice-roll-result {
+  margin-left: 0.1em;
+}
+
+.badge.dice-roll-result {
+  min-width: 3rem;
 }
 
 .fa-eye-slash {
