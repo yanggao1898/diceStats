@@ -35,32 +35,27 @@
   }
 }
 
+body {
+  /* Margin bottom by footer height */
+  /*margin-bottom: 60px;*/
+  background-color: #555555;
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
 span.dice-roll-result + span.dice-roll-result {
   margin-left: 0.1em;
 }
 
+div.dice_pool_entry + div.dice_pool_entry {
+  margin-top: 1rem;
+}
+
 .badge.dice-roll-result {
   min-width: 3rem;
-}
-
-.fa-eye-slash {
-  color: firebrick;
-}
-
-.fa-eye {
-  color: slateblue;
-}
-
-.dice_pool_entry {
-  min-height: 3.5rem;
-}
-
-.-minh35 {
-  min-height: 3.5rem;
-}
-
-@media (max-width: 765px) {
-
 }
 
 .card {
@@ -71,98 +66,17 @@ span.dice-roll-result + span.dice-roll-result {
   max-height: min-content;
 }
 
-.dice_pool_entry-card-body {
-  padding-left: 0px;
-  padding-right: 0px;
-  display: flex;
-  flex-wrap: wrap;
+.card-fa-eyes {
+  padding: 0.25rem;
 }
 
-.scroll-y {
-  overflow-y: auto;
+.card-header {
+  padding: 0.5rem 1rem;
 }
 
-.nav {
-  margin-top: 5px;
-  margin-bottom: 15px;
-  padding-right: 0;
-}
-
-.-flexd-rr {
-  flex-direction: row-reverse;
-}
-
-.-mh-mc {
-  max-height: min-content;
-}
-
-.-lr-marg-auto {
-  margin-left:auto;
-  margin-right:auto;
-}
-
-html {
-  position: relative;
-  min-height: 100%;
-}
-body {
-  /* Margin bottom by footer height */
-  /*margin-bottom: 60px;*/
-  background-color: #555555;
-}
-
-#statTable {
-  color: white;
-}
-
-.nav-link {
-  background-color: white;
-}
-
-.footer {
-  margin-top:15px;
-  margin-bottom:5px;
-}
-
-.-flex0 {
-  flex: 0 0 auto;
-}
-
-.-flex1 {
-  flex: 1 1 auto;
-}
-
-.-flex-wrap {
-  flex-flow: wrap;
-}
-
-.-flex-column {
-  flex-direction: column;
-}
-
-.-edit-dice-val {
-  width:3rem;
-}
-
-.h100 {
-  height: 100%;
-}
-
-.container-fluid {
-
-}
-
-.greyout {
-  opacity: 0.3;
-}
-
-.-stat-warn-alert {
-  width: fit-content;
-  margin: auto;
-}
-
-.-tbl-lbl {
-  width: 12rem;
+.-card-title {
+  margin-bottom: 0px;
+  padding: 0.25rem;
 }
 
 .dice_count_label {
@@ -177,4 +91,113 @@ body {
 
 .dice_pool_edit_btn_grp + .dropdown-menu {
     min-width: 4rem;
+}
+
+.dice_pool_entry {
+  height: 3.5rem;
+}
+
+.dice_pool_entry-card-body {
+  padding-left: 0px;
+  padding-right: 0px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+}
+
+.dice_pool_use:hover {
+  background-color: lightgray;
+}
+
+.-edit-dice-val {
+  width:3rem;
+}
+
+.fa-eye {
+  color: dodgerblue;
+}
+
+.fa-eye-slash {
+  color: firebrick;
+}
+
+.-fa-faded {
+  color: lightslategray!important;
+}
+
+.-flex0 {
+  flex: 0 0 auto;
+}
+
+.-flex1 {
+  flex: 1 1 auto;
+}
+
+.-flex-column {
+  flex-direction: column;
+}
+
+.-flex-wrap {
+  flex-flow: wrap;
+}
+
+.-flexd-rr {
+  flex-direction: row-reverse;
+}
+
+.footer {
+  margin-top:15px;
+  margin-bottom:5px;
+}
+
+.greyout {
+  opacity: 0.3;
+}
+
+.h100 {
+  height: 100%;
+}
+
+.-lr-marg-auto {
+  margin-left:auto;
+  margin-right:auto;
+}
+
+.-l-marg-auto {
+  margin-left: auto;
+}
+
+.-mh-mc {
+  max-height: min-content;
+}
+
+.-minh35 {
+  min-height: 3.5rem;
+}
+
+.nav {
+  margin-top: 5px;
+  margin-bottom: 15px;
+  padding-right: 0;
+}
+
+.nav-link {
+  background-color: white;
+}
+
+.scroll-y {
+  overflow-y: auto;
+}
+
+.-stat-warn-alert {
+  width: fit-content;
+  margin: auto;
+}
+
+.-tbl-lbl {
+  width: 12rem;
+}
+
+#statTable {
+  color: white;
 }

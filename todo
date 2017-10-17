@@ -17,3 +17,14 @@ Estimate speed of stdev calculations. Do not auto-calculate if expected time is 
   x if the manual option is clicked, show the stats table with a progress indication over the table during the calculations
     x progress indicator can be a spinner at first
       x Maybe a progress bar later?
+
+Dice groups
+  x- Organize dice pool by group
+  - Allow users to add groups of dice
+  - Toggle show/hide as a whole group
+  - Order groupings by visible members
+
+  - Drag/drop
+    - d/d dice pool elements to different groups
+    - d/d dice entry elements to different positions
+      - save positions????? D:

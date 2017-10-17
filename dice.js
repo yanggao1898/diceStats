@@ -845,10 +845,12 @@ function processAddDiceMenu(e) {
 
     // ADD DICE TO POOL LIST
     var dEntry = createDicePoolEntry(dId);
+
     addDiceEntryToGroup(dEntry);
+    checkGroupVisibility("UserAdded"); //// THIS LINE IS HAXTASTIC. NEED BETTER WAY TO DO THIS
     //$("#dicePool").append(dEntry);
     storeLS();
-    
+
     // ADD DICE TO DICECOUNT TAB
     addUseDiceFromPool(dId);
 
@@ -896,13 +898,17 @@ function addDiceToNS(dId, dLabel, dSides) {
 function createDiceGroupCard(gId) {
   var label = ___dice.diceGroups[gId].label;
 
-  var cDiv = $("<div>").addClass("card").attr("id", gId);
+  var cDiv = $("<div>").addClass("card mb-2").attr("id", gId);
   var chDiv = $("<div>").addClass("card-header");
   var cbDiv = $("<div>").addClass("card-body dice_pool_entry-card-body");
   var cardBGC = $("body").css("background-color");
   chDiv.append(
-    $("<h6>").addClass("card-title").text(label).css(
-      "color", getTextColor(cardBGC)
+    $("<div>").addClass("d-flex").append(
+      $("<h6>").addClass("-card-title").text(label).css(
+        "color", getTextColor(cardBGC)
+      )
+    ).append(
+      $("<i>").addClass("-l-marg-auto card-fa-eyes fa fa-eye")
     )
   );
   cDiv.append(chDiv);
@@ -916,7 +922,7 @@ function createDicePoolEntry(id) {
   var sides = ___dice.dice[id].faces;
   var color = ___dice.dice[id].color;
 
-  var dPDiv = $("<div>").addClass("input-group mb-2 dice_pool_entry").attr("id", id);
+  var dPDiv = $("<div>").addClass("input-group dice_pool_entry").attr("id", id);
   var dL = $("<span>").addClass("input-group-addon -flex1 dice_pool_entry_label").text(label).css(
     {"color": getTextColor(color), "background-color": color }
   );
@@ -972,6 +978,40 @@ function createDicePoolEntry(id) {
   return dPDiv;
 }
 
+function checkGroupVisibility(e) {
+  var gTarget, gId, gEye;
+  if (e.target) {
+    gTarget = e.target.closest("div.card");
+    gId = gTarget.id;
+  } else {
+    gId = e;
+    gTarget = $("#"+gId);
+  }
+
+  gEye = $(gTarget).find(".card-fa-eyes");
+
+  var tVis = 0;
+  ___dice.diceGroups[gId].members.forEach(function (el) {
+    if(___dice.dice[el].visible) {
+      tVis++;
+    }
+  });
+
+  //debugger;
+  if (tVis == 0) {
+    gEye.removeClass("fa-eye -fa-faded");
+    gEye.addClass("fa-eye-slash");
+  } else {
+    gEye.removeClass("fa-eye-slash");
+    gEye.addClass("fa-eye");
+    if (tVis != ___dice.diceGroups[gId].members.length) {
+      gEye.addClass("-fa-faded");
+    } else {
+      gEye.removeClass("-fa-faded");
+    }
+  }
+}
+
 function toggleUseDiceFromPool(e) {
   //debugger;
   var togTarget = e.target.closest("div.dice_pool_entry");
@@ -998,7 +1038,7 @@ function toggleUseDiceFromPool(e) {
     // after clicking checkbox, checkbox is unchecked
     delUseDiceFromPool(dId);
   }
-
+  checkGroupVisibility(e);
   //___dice[dId].visible = e.target.checked;
   storeLS();
 }
@@ -1044,7 +1084,7 @@ function deleteDicePoolEntry(e) {
   ___dice.diceGroups[gId].members.splice(
     ___dice.diceGroups[gId].members.indexOf(dId), 1
   );
-
+  checkGroupVisibility(gId);
   //___dice.diceGroups["UserAdded"].members.indexOf("d12_852458317")
   storeLS();
 }
@@ -1327,6 +1367,7 @@ function initializeDice() {
         addUseDiceFromPool(dId);
 
       });
+      checkGroupVisibility(gId);
     }
   });
   /*
@@ -1376,6 +1417,8 @@ function init() {
   $("#dicePool").on("click", ".dice_pool_del_btn", deleteDicePoolEntry);
   $("#dicePool").on("click", ".dice_pool_use", toggleUseDiceFromPool);
   $("#dicePool").on("click", ".dice_pool_edit_btn", editDicePoolEntry);
+  $("#dicePool").on("click", ".card-fa-eyes", checkGroupVisibility);
+
   $("#diceEditModal").on("hidden.bs.modal", modalHide);
   $("#diceEditModal").on("change", "#modalDiceEditLabel", modalLabelChange);
   $("#diceEditModal").on("change", ".modal-table-val-entry", modalValSymChange);
