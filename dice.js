@@ -263,7 +263,12 @@ function displayRolls(diceResult) {
     );
     diceDiv.append($("<br>"));
   }
-  diceDiv.append($("<span>").addClass("badge badge-secondary mt-1").text("Total: " + total));
+  var color = calcStatColor(total);
+  diceDiv.append(
+    $("<span>").addClass(
+      "badge badge-secondary mt-1"
+    ).text("Total: " + total).css("color", color)
+  );
   $("#clearRollBtn").show();
 }
 
@@ -529,10 +534,7 @@ function workerDone(returnObj) {
   $(document).scrollTop($("#statWarnTarget").position().top);
 }
 
-
 function calculateStats(finalIdx, finalStep) {
-
-  ___stats = {}
   var range, mean, median, mode;
   var stdev;
 
@@ -587,7 +589,40 @@ function calculateStats(finalIdx, finalStep) {
   }
 }
 
+function calcStatColor(tot) {
+  var crimson = [220, 20, 60]; // below average
+  var deepskyblue = [0, 191, 255]; // above average
+  var spectrum = [crimson, deepskyblue];
+  var white = [255, 255, 255];
+
+  if (___stats.mean == undefined || ___stats.range == undefined) {
+    return "white";
+  } else {
+    var avg = (___stats.range[0] + ___stats.range[1]) / 2;
+    var diff = tot - avg;
+    var rangeIdx = -1;
+    if (diff < 0) {
+      // below average
+      diff = -1 * diff;
+      rangeIdx = 0;
+    } else {
+      rangeIdx = 1;
+    }
+
+    var bRange = avg - ___stats.range[rangeIdx];
+    var percent = diff/bRange;
+    var retColor = white.slice();
+    for (var i = 0; i < retColor.length; i++)
+    {
+      retColor[i] = white[i] - (white[i] - spectrum[rangeIdx][i])*percent;
+    }
+
+    return "rgb (" + retColor[0] + "," + retColor[1] + "," + retColor[2] + ")";
+  }
+}
+
 function calculateDice(e) {
+  ___stats = {};
   if (typeof(Worker) !== "undefined" && ___WORKERACTIVE != false) {
     ___WORKERACTIVE.terminate();
   }
@@ -830,8 +865,9 @@ function toggleStats() {
 
 function processAddDiceMenu(e) {
   if (e.target.className == "dropdown-item") {
-    var dType = e.target.text;
-    var dSides = dType.replace ( /[^\d.]/g, '' );
+    //debugger;
+    var dType = $(e.target).data().dicetype;
+    var dSides = dType.replace( /[^\d.]/g, '' );
     dSides = parseInt(dSides, 10);
 
     var dId = dType + (new Date()).valueOf() + Math.random();
@@ -859,13 +895,57 @@ function processAddDiceMenu(e) {
   }
 }
 
+function processAddGroupMenu(e) {
+  // ***** diceTmpl should eventually come from XMLHttpRequest *****
+  if (e.target.className == "dropdown-item") {
+    var gType = $(e.target).data().dicegrp;
+    if (!(gType in diceTmpl.groups))
+      return;
+    if(___dice.diceGroups[gType] == undefined) {
+      ___dice.diceGroups[gType] = diceTmpl.groups[gType];
+
+    } else if(___dice.diceGroups[gType].members != diceTmpl.groups[gType].members) {
+      debugger;
+      diceTmpl.groups[gType].members.forEach(function (dId) {
+        if(___dice.diceGroups[gType].members.indexOf(dId) == -1) {
+          ___dice.diceGroups[gType].members.push(dId);
+        }
+      });
+    }
+
+    ___dice.diceGroups[gType].members.forEach(function (dId) {
+      if(!(dId in ___dice.dice)) {
+        if(!(dId in diceTmpl.dice)) {
+          // so far only used for adding the default dnd dice set
+          var dType = dId.match(/.*[^\D]/)[0];
+          var dSides = dType.replace( /[^\d.]/g, '' );
+          dSides = parseInt(dSides, 10);
+          addDiceToNS(dId, dType, dSides);
+        } else {
+          ___dice.dice[dId] = diceTmpl.dice[dId];
+        }
+        var dEntry = createDicePoolEntry(dId);
+        addDiceEntryToGroup(dEntry, gType);
+        // ADD DICE TO DICECOUNT TAB
+        addUseDiceFromPool(dId);
+      }
+    });
+    checkGroupVisibility(gType);
+    //$("#dicePool").append(dEntry);
+    storeLS();
+
+  }
+}
+
 function addDiceEntryToGroup(dEntry, dgId) {
   if(dgId == null || dgId == undefined) {
     dgId = "UserAdded";
   }
   var dId = dEntry.attr("id");
+  if(___dice.diceGroups[dgId].members.indexOf(dId) == -1) {
+    ___dice.diceGroups[dgId].members.push(dId);
+  }
 
-  ___dice.diceGroups[dgId].members.push(dId);
 
   var grpCard = $("#"+dgId);
   if (grpCard.length == 0) {
@@ -877,11 +957,8 @@ function addDiceEntryToGroup(dEntry, dgId) {
 }
 
 function addDiceToNS(dId, dLabel, dSides) {
-  var range = [];
+  var range = Array.apply(null, {length:dSides}).map(Number.call, Number);
   var syms = new Array(dSides).fill(null);
-  for (var i = 1; i <= dSides; i++) {
-    range.push(i);
-  }
   ___dice.dice[dId] = {
     "label" : dLabel,
     "numFaces" : dSides,
@@ -917,21 +994,23 @@ function createDiceGroupCard(gId) {
   return cDiv;
 }
 
-function createDicePoolEntry(id) {
-  var label = ___dice.dice[id].label;
-  var sides = ___dice.dice[id].faces;
-  var color = ___dice.dice[id].color;
+function createDicePoolEntry(dId) {
+  var label = ___dice.dice[dId].label;
+  var sides = ___dice.dice[dId].faces;
+  var color = ___dice.dice[dId].color;
 
-  var dPDiv = $("<div>").addClass("input-group dice_pool_entry").attr("id", id);
+  var dPDiv = $("<div>").addClass("input-group dice_pool_entry").attr("id", dId);
   var dL = $("<span>").addClass("input-group-addon -flex1 dice_pool_entry_label").text(label).css(
     {"color": getTextColor(color), "background-color": color }
   );
 
   //var fACbIcon = ___dice[id].visible ? "fa-check-square-o" : "fa-square-o";
-  var fACbIcon = ___dice.dice[id].visible ? "fa-eye" : "fa-eye-slash";
+  var fACbIcon = ___dice.dice[dId].visible ? "fa-eye" : "fa-eye-slash";
 
+  ////dFACb = dice Font Awesome Check box
+  ////was originally checkbox, but is now eye and eye-slash
   var dFACb = $("<span>").addClass("input-group-addon dice_pool_use").append(
-    $("<i>").addClass("fa fa-fw " + fACbIcon)
+    $("<i>").addClass("fa fa-fw -dVisI " + fACbIcon)
   );
 
   var dBtnGrp = $("<div>").addClass("btn-group").append(
@@ -978,15 +1057,10 @@ function createDicePoolEntry(id) {
   return dPDiv;
 }
 
-function checkGroupVisibility(e) {
-  var gTarget, gId, gEye;
-  if (e.target) {
-    gTarget = e.target.closest("div.card");
-    gId = gTarget.id;
-  } else {
-    gId = e;
-    gTarget = $("#"+gId);
-  }
+function checkGroupVisibility(gId) {
+  var gTarget, gEye;
+
+  gTarget = $("#"+gId);
 
   gEye = $(gTarget).find(".card-fa-eyes");
 
@@ -1001,6 +1075,7 @@ function checkGroupVisibility(e) {
   if (tVis == 0) {
     gEye.removeClass("fa-eye -fa-faded");
     gEye.addClass("fa-eye-slash");
+    gTarget.css("order", "99")
   } else {
     gEye.removeClass("fa-eye-slash");
     gEye.addClass("fa-eye");
@@ -1009,7 +1084,36 @@ function checkGroupVisibility(e) {
     } else {
       gEye.removeClass("-fa-faded");
     }
+    gTarget.css("order", "");
   }
+}
+
+function toggleGroupVisibility(e) {
+  var gTarget = e.target.closest("div.card");
+  var gId = gTarget.id;
+  var gEye = $(gTarget).find(".card-fa-eyes");
+
+  if (gEye.hasClass("fa-eye")) {
+    // if visible or partially visible, make all invisible
+    ___dice.diceGroups[gId].members.forEach(function (dId) {
+      if(___dice.dice[dId].visible) {
+        $("#"+dId).find("i.-dVisI").toggleClass("fa-eye fa-eye-slash");
+        ___dice.dice[dId].visible = false;
+        delUseDiceFromPool(dId);
+      }
+    });
+  } else {
+    // if not visible, make all visible
+    ___dice.diceGroups[gId].members.forEach(function (dId) {
+      if(!___dice.dice[dId].visible) {
+        $("#"+dId).find("i.-dVisI").toggleClass("fa-eye fa-eye-slash");
+        ___dice.dice[dId].visible = true;
+        addUseDiceFromPool(dId);
+      }
+    });
+  }
+  storeLS();
+  checkGroupVisibility(gId);
 }
 
 function toggleUseDiceFromPool(e) {
@@ -1017,10 +1121,12 @@ function toggleUseDiceFromPool(e) {
   var togTarget = e.target.closest("div.dice_pool_entry");
   var dId = togTarget.id;
   //debugger;
+  var gId = e.target.closest("div.card").id;
+
   ___dice.dice[dId].visible = !___dice.dice[dId].visible;
   var targ;
   if ($(e.target).is("span")) {
-    targ = $(e.target).find("i.fa");
+    targ = $(e.target).find("i.-dVisI");
   } else {
     targ = $(e.target);
   }
@@ -1038,7 +1144,7 @@ function toggleUseDiceFromPool(e) {
     // after clicking checkbox, checkbox is unchecked
     delUseDiceFromPool(dId);
   }
-  checkGroupVisibility(e);
+  checkGroupVisibility(gId);
   //___dice[dId].visible = e.target.checked;
   storeLS();
 }
@@ -1067,7 +1173,7 @@ function delUseDiceFromPool(dId) {
 
 
 function deleteDicePoolEntry(e) {
-  debugger;
+  //debugger;
   var delTarget = e.target.closest("div.dice_pool_entry");
   var dId = delTarget.id;
   var delGrp = e.target.closest("div.card");
@@ -1370,26 +1476,9 @@ function initializeDice() {
       checkGroupVisibility(gId);
     }
   });
-  /*
-  diceKeys.forEach(function (dId) {
-    $("#dicePool").append(createDicePoolEntry(dId));
-    addUseDiceFromPool(dId);
-  });
-  */
 }
 
 function init() {
-  /*//
-  ___dice.dice.d6_DarkSouls_black = {"label" : "DS-Black", "numFaces": 6, "faces" : [0, 1, 1, 1, 2, 2], "symbols" : new Array(6).fill(null), "color": "black", "visible": true, "group": "Dark Souls"}
-  ___dice.dice.d6_DarkSouls_blue = {"label" : "DS-Blue", "numFaces": 6, "faces" : [1, 2, 2, 2, 3, 3], "symbols" : new Array(6).fill(null), "color" : "blue", "visible": true, "group": "Dark Souls"}
-  ___dice.dice.d6_DarkSouls_orange = {"label" : "DS-Orange", "numFaces": 6, "faces" : [1, 2, 2, 3, 3, 4], "symbols" : new Array(6).fill(null), "color": "orange", "visible": true, "group": "Dark Souls"}
-
-  ___dice.dice.d6_MassiveDarknes_red = {"label" : "MD-Red", "numFaces": 6, "faces" : [0, 1, 1, 2, 2, 3], "symbols" : [,,,"fa-sun-o", "fa-sun-o", "fa-diamond"], "color": "orangered", "visible": true, "group": "Massive Darkness"}
-  ___dice.dice.d6_MassiveDarknes_yellow = {"label" : "MD-Yellow", "numFaces": 6, "faces" : [0, 1, 1, 1, 1, 2], "symbols" : [,,,,,"fa-sun-o"], "color" : "gold", "visible": true, "group": "Massive Darkness"}
-  ___dice.dice.d6_MassiveDarknes_blue = {"label" : "MD-Blue", "numFaces": 6, "faces" : [0, 0, 1, 1, 1, 2], "symbols" : [,,,,,"fa-sun-o"], "color": "skyblue", "visible": true, "group": "Massive Darkness"}
-  ___dice.dice.d6_MassiveDarknes_green = {"label" : "MD-Green", "numFaces": 6, "faces" : [0, 0, 1, 2, 2, 3], "symbols" : [,,,"fa-sun-o", "fa-sun-o", "fa-diamond"], "color": "lawngreen", "visible": true, "group": "Massive Darkness"}
-  ___dice.meta.version = 0.2;
-  //*/
 
   // needs code for version compatibility check later
   if(localStorage.userDice) {
@@ -1402,8 +1491,6 @@ function init() {
   initializeSymbols();
   initializeDice();
 
-
-
   $("#dices").change(calculateDice);
   $("#rollDiceBtn").click(rollDice);
   $("#resetDiceBtn").click(resetDice);
@@ -1413,11 +1500,13 @@ function init() {
     console.log(e);
   }); //*/
   $("#btnDicePoolAddMenu").click(processAddDiceMenu);
+  $("#btnDiceGroupAddMenu").click(processAddGroupMenu);
 
   $("#dicePool").on("click", ".dice_pool_del_btn", deleteDicePoolEntry);
   $("#dicePool").on("click", ".dice_pool_use", toggleUseDiceFromPool);
   $("#dicePool").on("click", ".dice_pool_edit_btn", editDicePoolEntry);
-  $("#dicePool").on("click", ".card-fa-eyes", checkGroupVisibility);
+  $("#dicePool").on("click", ".card-fa-eyes", toggleGroupVisibility);
+
 
   $("#diceEditModal").on("hidden.bs.modal", modalHide);
   $("#diceEditModal").on("change", "#modalDiceEditLabel", modalLabelChange);

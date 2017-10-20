@@ -21,10 +21,12 @@ Estimate speed of stdev calculations. Do not auto-calculate if expected time is 
 Dice groups
   x- Organize dice pool by group
   - Allow users to add groups of dice
-  - Toggle show/hide as a whole group
-  - Order groupings by visible members
+  x- Toggle show/hide as a whole group
+  x- Order groupings by visible members
 
   - Drag/drop
     - d/d dice pool elements to different groups
     - d/d dice entry elements to different positions
       - save positions????? D:
+    - d/d dice groups to different orders
+      - save ordering in ___dice

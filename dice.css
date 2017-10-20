@@ -58,6 +58,10 @@ div.dice_pool_entry + div.dice_pool_entry {
   min-width: 3rem;
 }
 
+.btn-group + .btn-group {
+  margin-left: 1rem;
+}
+
 .card {
   background-color: inherit;
 }
@@ -150,12 +154,21 @@ div.dice_pool_entry + div.dice_pool_entry {
   margin-bottom:5px;
 }
 
+.dice_count_label + .form-control {
+  border-width: 0 0 0 1px;
+}
+
 .greyout {
   opacity: 0.3;
 }
 
 .h100 {
   height: 100%;
+}
+
+.input-group-addon:not(:last-child) {
+  background-clip: padding-box;
+  border-width: 0px;
 }
 
 .-lr-marg-auto {
