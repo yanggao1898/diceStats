@@ -264,6 +264,7 @@ function displayRolls(diceResult) {
     diceDiv.append($("<br>"));
   }
   var color = calcStatColor(total);
+  //debugger;
   diceDiv.append(
     $("<span>").addClass(
       "badge badge-secondary mt-1"
@@ -614,10 +615,10 @@ function calcStatColor(tot) {
     var retColor = white.slice();
     for (var i = 0; i < retColor.length; i++)
     {
-      retColor[i] = white[i] - (white[i] - spectrum[rangeIdx][i])*percent;
+      retColor[i] = Math.round(white[i] - (white[i] - spectrum[rangeIdx][i])*percent);
     }
 
-    return "rgb (" + retColor[0] + "," + retColor[1] + "," + retColor[2] + ")";
+    return "rgb(" + retColor[0] + "," + retColor[1] + "," + retColor[2] + ")";
   }
 }
 
