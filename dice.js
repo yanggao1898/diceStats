@@ -604,13 +604,13 @@ function calcStatColor(tot) {
     var rangeIdx = -1;
     if (diff < 0) {
       // below average
-      diff = -1 * diff;
+      //diff = -1 * diff;
       rangeIdx = 0;
     } else {
       rangeIdx = 1;
     }
 
-    var bRange = avg - ___stats.range[rangeIdx];
+    var bRange = ___stats.range[rangeIdx] - avg;
     var percent = diff/bRange;
     var retColor = white.slice();
     for (var i = 0; i < retColor.length; i++)
