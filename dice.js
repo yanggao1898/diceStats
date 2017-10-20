@@ -957,7 +957,7 @@ function addDiceEntryToGroup(dEntry, dgId) {
 }
 
 function addDiceToNS(dId, dLabel, dSides) {
-  var range = Array.apply(null, {length:dSides}).map(Number.call, Number);
+  var range = Array.apply(null, new Array(dSides)).map((_,i) => i+1);
   var syms = new Array(dSides).fill(null);
   ___dice.dice[dId] = {
     "label" : dLabel,

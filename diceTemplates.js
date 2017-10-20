@@ -72,7 +72,7 @@ const diceTmpl = function() {
   ___tmpl.dice.d4_DnD = {
     "label" : "d4",
   	"numFaces": 4,
-  	"faces" : Array.apply(null, {length: 4}).map(Number.call, Number),
+  	"faces" : Array.apply(null, new Array(4)).map((_,i) => i+1),
   	"symbols" : new Array(4).fill(null),
   	"color": "lightblue",
   	"visible": true,
@@ -82,7 +82,7 @@ const diceTmpl = function() {
   ___tmpl.dice.d6_DnD = {
     "label" : "d6",
   	"numFaces": 6,
-  	"faces" : Array.apply(null, {length: 6}).map(Number.call, Number),
+  	"faces" : Array.apply(null, new Array(6)).map((_,i) => i+1),
   	"symbols" : new Array(4).fill(null),
   	"color": "darkorange",
   	"visible": true,
@@ -92,7 +92,7 @@ const diceTmpl = function() {
   ___tmpl.dice.d8_DnD = {
     "label" : "d8",
   	"numFaces": 8,
-  	"faces" : Array.apply(null, {length: 8}).map(Number.call, Number),
+  	"faces" : Array.apply(null, new Array(8)).map((_,i) => i+1),
   	"symbols" : new Array(4).fill(null),
   	"color": "orchid",
   	"visible": true,
@@ -102,7 +102,7 @@ const diceTmpl = function() {
   ___tmpl.dice.d10_DnD = {
     "label" : "d10",
   	"numFaces": 10,
-  	"faces" : Array.apply(null, {length: 10}).map(Number.call, Number),
+  	"faces" : Array.apply(null, new Array(10)).map((_,i) => i+1),
   	"symbols" : new Array(4).fill(null),
   	"color": "darkslategray",
   	"visible": true,
@@ -112,7 +112,7 @@ const diceTmpl = function() {
   ___tmpl.dice.d12_DnD = {
     "label" : "d12",
   	"numFaces": 12,
-  	"faces" : Array.apply(null, {length: 12}).map(Number.call, Number),
+  	"faces" : Array.apply(null, new Array(12)).map((_,i) => i+1),
   	"symbols" : new Array(4).fill(null),
   	"color": "crimson",
   	"visible": true,
@@ -122,7 +122,7 @@ const diceTmpl = function() {
   ___tmpl.dice.d20_DnD = {
     "label" : "d20",
   	"numFaces": 20,
-  	"faces" : Array.apply(null, {length: 20}).map(Number.call, Number),
+  	"faces" : Array.apply(null, new Array(20)).map((_,i) => i+1),
   	"symbols" : new Array(4).fill(null),
   	"color": "springgreen",
   	"visible": true,
@@ -132,7 +132,7 @@ const diceTmpl = function() {
   ___tmpl.dice.d100_DnD = {
     "label" : "d100",
   	"numFaces": 100,
-  	"faces" : Array.apply(null, {length: 100}).map(Number.call, Number),
+  	"faces" : Array.apply(null, new Array(100)).map((_,i) => i+1),
   	"symbols" : new Array(4).fill(null),
   	"color": "lightcyan",
   	"visible": true,
