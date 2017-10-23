@@ -267,7 +267,7 @@ function displayRolls(diceResult) {
   //debugger;
   diceDiv.append(
     $("<span>").addClass(
-      "badge badge-secondary mt-1"
+      "badge badge-dark mt-1"
     ).text("Total: " + total).css("color", color)
   );
   $("#clearRollBtn").show();
@@ -440,9 +440,11 @@ function calculateDiceWrapper() {
         step0Idx.push(tmpArr[i]);
       }
     }
+    /*// ????? What was this for?
     step0Idx.forEach( function(el) {
       step0[el] = step0[el];
     });
+    ???? //*/
     finalStep = step0;
     finalIdx = step0Idx;
     steps[0] = {"idx": step0Idx, "val": step0};

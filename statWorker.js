@@ -79,12 +79,12 @@ function calculateDiceCore(workArr, steps) {
 
     steps[i+1] = {"idx": stepxIdx, "val": stepx}
 
-    if (i == workArr.length-1) {
-      returnObj = { "finalStep": stepx, "finalIdx":stepxIdx, "pC": _pCount, "aC": _aCount};
-      //finalStep = stepx;  // Array of Big() numbers
-      //finalIdx = stepxIdx;
-    }
+
   }
+  var stepLen = Object.keys(steps).length;
+  returnObj = { "finalStep": steps[stepLen-1].val, "finalIdx":steps[stepLen-1].idx, "pC": _pCount, "aC": _aCount};
+  //finalStep = stepx;  // Array of Big() numbers
+  //finalIdx = stepxIdx;
   t2 = perf.now();
   returnObj["time"] = t2-t1;
   //debugger;
