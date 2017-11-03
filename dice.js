@@ -980,7 +980,9 @@ function createDiceGroupCard(gId) {
 
   var cDiv = $("<div>").addClass("card mb-2").attr("id", gId);
   var chDiv = $("<div>").addClass("card-header");
-  var cbDiv = $("<div>").addClass("card-body dice_pool_entry-card-body");
+  var cbDiv = $("<div>").addClass(
+    "card-body dice_pool_entry-card-body"
+  ).attr("id", gId + "-list-group");
   var cardBGC = $("body").css("background-color");
   chDiv.append(
     $("<div>").addClass("d-flex").append(
@@ -993,6 +995,40 @@ function createDiceGroupCard(gId) {
   );
   cDiv.append(chDiv);
   cDiv.append(cbDiv);
+
+  cbDiv.sortable({
+    group: {name: "dice-edit", pull: true, put: true},
+    animation: 100,
+    ghostClass: "ghost-dice",
+    scroll: true,
+    onSort: function (e) {
+      var dId = e.item.id;
+      var fgId = e.from.id.replace("-list-group", "");
+      var tgId = e.to.id.replace("-list-group", "");
+      var oldIdx = e.oldIndex;
+      var newIdx = e.newIndex;
+      if (fgId != tgId) {
+        var fIdx = ___dice.diceGroups[fgId].members.indexOf(dId);
+        if (fIdx > -1) {
+          ___dice.diceGroups[fgId].members.splice(fIdx, 1);
+        } else {
+          console.log("Warn: dice " + dId + " not found in expected group " + fgId);
+        }
+        var tArr = ___dice.diceGroups[tgId].members.splice(newIdx);
+        ___dice.diceGroups[tgId].members.push(dId);
+        ___dice.diceGroups[tgId].members = ___dice.diceGroups[tgId].members.concat(tArr);
+      } else {
+        var targ = ___dice.diceGroups[fgId].members.splice(oldIdx, 1);
+        var tArr = ___dice.diceGroups[fgId].members.splice(newIdx);
+        ___dice.diceGroups[tgId].members.push(targ);
+        ___dice.diceGroups[tgId].members = ___dice.diceGroups[tgId].members.concat(tArr);
+      }
+
+
+
+      storeLS();
+    }
+  });
 
   return cDiv;
 }

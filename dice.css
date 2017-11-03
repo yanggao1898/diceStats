@@ -88,6 +88,10 @@ div.dice_pool_entry + div.dice_pool_entry {
   flex: 1;
 }
 
+.dice_count_label + .form-control {
+  border-width: 0 0 0 1px;
+}
+
 .dice_pool_edit_btn_grp {
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
@@ -154,8 +158,8 @@ div.dice_pool_entry + div.dice_pool_entry {
   margin-bottom:5px;
 }
 
-.dice_count_label + .form-control {
-  border-width: 0 0 0 1px;
+.ghost-dice {
+  opacity: 0.5;
 }
 
 .greyout {
