@@ -1001,30 +1001,34 @@ function createDiceGroupCard(gId) {
     animation: 100,
     ghostClass: "ghost-dice",
     scroll: true,
-    onSort: function (e) {
+    onAdd: function (e) {
       var dId = e.item.id;
       var fgId = e.from.id.replace("-list-group", "");
       var tgId = e.to.id.replace("-list-group", "");
       var oldIdx = e.oldIndex;
       var newIdx = e.newIndex;
-      if (fgId != tgId) {
-        var fIdx = ___dice.diceGroups[fgId].members.indexOf(dId);
-        if (fIdx > -1) {
-          ___dice.diceGroups[fgId].members.splice(fIdx, 1);
-        } else {
-          console.log("Warn: dice " + dId + " not found in expected group " + fgId);
-        }
-        var tArr = ___dice.diceGroups[tgId].members.splice(newIdx);
-        ___dice.diceGroups[tgId].members.push(dId);
-        ___dice.diceGroups[tgId].members = ___dice.diceGroups[tgId].members.concat(tArr);
+      var fIdx = ___dice.diceGroups[fgId].members.indexOf(dId);
+      if (fIdx > -1) {
+        ___dice.diceGroups[fgId].members.splice(fIdx, 1);
       } else {
-        var targ = ___dice.diceGroups[fgId].members.splice(oldIdx, 1);
-        var tArr = ___dice.diceGroups[fgId].members.splice(newIdx);
-        ___dice.diceGroups[tgId].members.push(targ);
-        ___dice.diceGroups[tgId].members = ___dice.diceGroups[tgId].members.concat(tArr);
+        console.log("Warn: dice " + dId + " not found in expected group " + fgId);
       }
+      var tArr = ___dice.diceGroups[tgId].members.splice(newIdx);
+      ___dice.diceGroups[tgId].members.push(dId);
+      ___dice.diceGroups[tgId].members = ___dice.diceGroups[tgId].members.concat(tArr);
 
-
+      storeLS();
+    },
+    onUpdate: function (e) {
+      var dId = e.item.id;
+      var fgId = e.from.id.replace("-list-group", "");
+      var tgId = e.to.id.replace("-list-group", ""); // literally the same as fgid for onUpdate
+      var oldIdx = e.oldIndex;
+      var newIdx = e.newIndex;
+      var targ = ___dice.diceGroups[fgId].members.splice(oldIdx, 1);
+      var tArr = ___dice.diceGroups[fgId].members.splice(newIdx);
+      //___dice.diceGroups[tgId].members.push(targ[0]);
+      ___dice.diceGroups[tgId].members = ___dice.diceGroups[tgId].members.concat(targ, tArr);
 
       storeLS();
     }
