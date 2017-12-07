@@ -163,8 +163,14 @@ function ___Estimator2(dices) {
 function rollDice() {
   // get all the visible dice's IDs from the DOM
   var allDices = $("#dices").find("[id]").map(function () {
-    return $(this).data("dice_id");
+    var a = $(this).closest("div.input-group").css("order");
+    var dId = $(this).data("dice_id");
+    var x = {};
+    x[a] =  dId;
+    return x;
   }).get();
+  allDices.sort(function(x, y) { return Object.keys(x)[0] - Object.keys(y)[0] });
+  allDices = allDices.map(function(z) { return Object.values(z)[0] });
 
   var diceCount = [];
   // gets the number of times each dice has to be rolled, put them into *diceCount
@@ -908,7 +914,7 @@ function processAddGroupMenu(e) {
       ___dice.diceGroups[gType] = diceTmpl.groups[gType];
 
     } else if(___dice.diceGroups[gType].members != diceTmpl.groups[gType].members) {
-      debugger;
+      //debugger;
       diceTmpl.groups[gType].members.forEach(function (dId) {
         if(___dice.diceGroups[gType].members.indexOf(dId) == -1) {
           ___dice.diceGroups[gType].members.push(dId);
@@ -977,8 +983,14 @@ function addDiceToNS(dId, dLabel, dSides) {
 
 function createDiceGroupCard(gId) {
   var label = ___dice.diceGroups[gId].label;
-
-  var cDiv = $("<div>").addClass("card mb-2").attr("id", gId);
+  var cOrder = ___dice.diceGroups[gId].order;
+  var cDiv = $("<div>").addClass(
+    "card mb-2"
+  ).attr(
+    "id", gId
+  ).css(
+    "order", cOrder
+  );
   var chDiv = $("<div>").addClass("card-header");
   var cbDiv = $("<div>").addClass(
     "card-body dice_pool_entry-card-body"
@@ -1016,7 +1028,7 @@ function createDiceGroupCard(gId) {
       var tArr = ___dice.diceGroups[tgId].members.splice(newIdx);
       ___dice.diceGroups[tgId].members.push(dId);
       ___dice.diceGroups[tgId].members = ___dice.diceGroups[tgId].members.concat(tArr);
-
+      checkGroupVisibility(tgId);
       storeLS();
     },
     onUpdate: function (e) {
@@ -1031,10 +1043,33 @@ function createDiceGroupCard(gId) {
       ___dice.diceGroups[tgId].members = ___dice.diceGroups[tgId].members.concat(targ, tArr);
 
       storeLS();
+    },
+    onRemove: function (e) {
+      var gId = e.to.id.replace("-list-group", "");
+      checkGroupVisibility(gId);
+    },
+    onSort: function (e) {
+      var gId = e.to.id.replace("-list-group", "");
+      setDiceOrdering(gId);
     }
   });
 
   return cDiv;
+}
+
+function setDiceOrdering(gId) {
+  var gOrder = $("#"+gId).css("order") * 1;
+
+  var diceList = ___dice.diceGroups[gId].members;
+  //var diceOrderLength = diceList.length;
+
+  for(var i = 0; i < diceList.length; i++) {
+    var dId = diceList[i];
+    if(___dice.dice[dId].visible) {
+      var targIG = $("#" + dId + "_count").closest("div.input-group");
+      targIG.css("order", gOrder * 1000 + i);
+    }
+  }
 }
 
 function createDicePoolEntry(dId) {
@@ -1113,13 +1148,21 @@ function checkGroupVisibility(gId) {
       tVis++;
     }
   });
-
+  var gOrder = gTarget.css("order");
+  gOrder *= 1;
   //debugger;
   if (tVis == 0) {
+    if(gEye.hasClass("fa-eye")) {
+      gOrder += 1000;
+      gTarget.css("order", gOrder);
+    }
     gEye.removeClass("fa-eye -fa-faded");
     gEye.addClass("fa-eye-slash");
-    gTarget.css("order", "99")
   } else {
+    if (gEye.hasClass("fa-eye-slash")) {
+      gOrder -= 1000;
+      gTarget.css("order", gOrder);
+    }
     gEye.removeClass("fa-eye-slash");
     gEye.addClass("fa-eye");
     if (tVis != ___dice.diceGroups[gId].members.length) {
@@ -1127,7 +1170,6 @@ function checkGroupVisibility(gId) {
     } else {
       gEye.removeClass("-fa-faded");
     }
-    gTarget.css("order", "");
   }
 }
 
@@ -1188,6 +1230,7 @@ function toggleUseDiceFromPool(e) {
     delUseDiceFromPool(dId);
   }
   checkGroupVisibility(gId);
+  setDiceOrdering(gId);
   //___dice[dId].visible = e.target.checked;
   storeLS();
 }
@@ -1471,7 +1514,7 @@ function storeLS() {
 function restoreLS() {
   // compatibility check
   function compatCheck(tmp) {
-    if (!tmp.meta || !tmp.meta.version || tmp.meta.version < ___dice.meta.version) {
+    if (!tmp.meta || !tmp.meta.version || tmp.meta.version.toString() < ___dice.meta.version.toString()) {
       return false;
     }
     /*if (!tmp.d6_DarkSouls_black || !tmp.d6_DarkSouls_black.symbols) {
@@ -1516,7 +1559,9 @@ function initializeDice() {
         addUseDiceFromPool(dId);
 
       });
+
       checkGroupVisibility(gId);
+      setDiceOrdering(gId);
     }
   });
 }
